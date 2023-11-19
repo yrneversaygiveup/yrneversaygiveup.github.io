@@ -1,0 +1,441 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Unity渲染路径 | 雨夜</title><meta name="author" content="YRain"><meta name="copyright" content="YRain"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="referrer" content="no-referrer"><meta name="description" content="什么是渲染路径（rendering path） 渲染路径决定了光照是如何应用到unityshader中。  一般一个项目只使用一种渲染路径：  open Editor  关闭use defaults即可设置  设置多个渲染路径 可以在不同相机中设置不同的渲染路径   如果显卡不支持，unity会自动降一级渲染路径  |            标签名            |">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unity渲染路径">
+<meta property="og:url" content="http://yrain11.com/posts/4f764081.html">
+<meta property="og:site_name" content="雨夜">
+<meta property="og:description" content="什么是渲染路径（rendering path） 渲染路径决定了光照是如何应用到unityshader中。  一般一个项目只使用一种渲染路径：  open Editor  关闭use defaults即可设置  设置多个渲染路径 可以在不同相机中设置不同的渲染路径   如果显卡不支持，unity会自动降一级渲染路径  |            标签名            |">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg">
+<meta property="article:published_time" content="2023-09-09T01:15:35.000Z">
+<meta property="article:modified_time" content="2023-11-02T15:37:53.426Z">
+<meta property="article:author" content="YRain">
+<meta property="article:tag" content="ShaderLab">
+<meta property="article:tag" content="unity">
+<meta property="article:tag" content="渲染路径">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg"><link rel="shortcut icon" href="/img/fav.png"><link rel="canonical" href="http://yrain11.com/posts/4f764081.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: undefined,
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: YRain","link":"链接: ","source":"来源: 雨夜","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Unity渲染路径',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-11-02 23:37:53'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="APlayer.min.css"><div id="aplayer"></div><script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js" async></script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/xier.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">40</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">11</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="雨夜"><span class="site-name">雨夜</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Unity渲染路径</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-09-09T01:15:35.000Z" title="发表于 2023-09-09 09:15:35">2023-09-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-11-02T15:37:53.426Z" title="更新于 2023-11-02 23:37:53">2023-11-02</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/unity-shader-%E5%85%A5%E9%97%A8%E7%B2%BE%E8%A6%81%E6%80%BB%E7%BB%93/">unity shader 入门精要总结</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/unity-shader-%E5%85%A5%E9%97%A8%E7%B2%BE%E8%A6%81%E6%80%BB%E7%BB%93/%E7%AC%AC%E4%B9%9D%E7%AB%A0%EF%BC%9A%E6%9B%B4%E5%A4%8D%E6%9D%82%E7%9A%84%E5%85%89%E7%85%A7/">第九章：更复杂的光照</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Unity渲染路径"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="什么是渲染路径（rendering-path）"><a href="#什么是渲染路径（rendering-path）" class="headerlink" title="什么是渲染路径（rendering path）"></a>什么是渲染路径（rendering path）</h1><ul>
+<li><p>渲染路径决定了光照是如何应用到unityshader中。</p>
+</li>
+<li><p>一般一个项目只使用一种渲染路径：</p>
+<p><img src="https://gitee.com/yurain11/drawing-bed/raw/master/img/202304091246220.png" alt="image-20230409121105424"></p>
+<p>open Editor</p>
+<p><img src="https://gitee.com/yurain11/drawing-bed/raw/master/img/202304091211206.png" alt="image-20230409121149042"></p>
+<p>关闭use defaults即可设置</p>
+</li>
+<li><p>设置多个渲染路径</p>
+<p>可以在不同相机中设置不同的渲染路径</p>
+<p><img src="https://gitee.com/yurain11/drawing-bed/raw/master/img/202304091214244.png" alt="image-20230409121409169"></p>
+</li>
+<li><p>如果显卡不支持，unity会自动降一级渲染路径</p>
+</li>
+<li><p>|            标签名            |                             描述                             |<br>| :—————————————: | :—————————————————————————————: |<br>|            Always            |     不管使用哪种路径，该pass总是会被渲染，但不会计算光照     |<br>|         ForwardBase          | 用于向前渲染，会计算环境光，最重要的平行光，逐顶点/SH光源和Lightmaps |<br>|          ForwardAdd          |    向前渲染，会计算额外的逐像素光源，每个pass对应一个光源    |<br>|           Deferred           |                    延迟渲染，渲染G-buffer                    |<br>|         ShadowCaster         | 把物体的深度信息渲染到阴影纹理映射（shadowmap）或一张深度纹理中 |<br>|         PrepassBase          |        遗留的延迟渲染，会渲染法线和高光反射的指数部分        |<br>|         PrepassFinal         | 遗留的延迟渲染，通过合并纹理，光照，自发光来渲染最后得到的颜色 |<br>| Vertex,VertexLMRGBM,VertexLM |                      遗留的顶点照明渲染                      |</p>
+</li>
+</ul>
+<h2 id="向前渲染路径（Foward-Rendering-Path）"><a href="#向前渲染路径（Foward-Rendering-Path）" class="headerlink" title="向前渲染路径（Foward Rendering Path）"></a>向前渲染路径（Foward Rendering Path）</h2><pre><code class="lang-tex">Pass&#123;
+    Tags&#123;&quot;LightMode&quot;=&quot;ForwardBase&quot;|&quot;ForwardAdd&quot;&#125;
+&#125;
+</code></pre>
+<p>渲染对象的渲染图元并计算两个缓冲区</p>
+<ul>
+<li>颜色缓冲区</li>
+<li>深度缓冲区：决定是否可见</li>
+<li>对于每个逐像素光照都需要单独计算pass,当物体受到多个逐像素光照时，就要计算多个pass,N(物体数量)*M（逐像素光照）</li>
+<li>三种处理光照的方式：逐顶点处理，逐像素处理，球谐函数（SH）处理</li>
+</ul>
+<h3 id="unity渲染优先级"><a href="#unity渲染优先级" class="headerlink" title="unity渲染优先级"></a>unity渲染优先级</h3><ul>
+<li><p>最亮的平行光按照逐像素处理</p>
+</li>
+<li><p>渲染模式为Not Important的使用逐顶点和SH渲染。</p>
+</li>
+<li><p>Important使用逐像素</p>
+</li>
+<li><p>在以上规则后逐像素光源数量小于Quailty Setting 中的Pixel Light Count,则会有更多光源以逐像素处理</p>
+<p><img src="https://gitee.com/yurain11/drawing-bed/raw/master/img/202304091233770.png" alt="image-20230409123348674"></p>
+</li>
+</ul>
+<h3 id="两种pass的标签和渲染设置以及常规光照计算"><a href="#两种pass的标签和渲染设置以及常规光照计算" class="headerlink" title="两种pass的标签和渲染设置以及常规光照计算"></a>两种pass的标签和渲染设置以及常规光照计算</h3><ul>
+<li><pre><code class="lang-tex">#pragma multi_compile_fwdbase
+#pragma multi_compile_fwdadd
+只有为两个pass使用这两个编译指令，才可以在pass中得到正确的光照变量，比如光照衰减值。
+</code></pre>
+</li>
+<li><p>Base Pass可实现的光照效果：光照纹理，环境光，自发光，阴影（平行光阴影）</p>
+</li>
+<li><p>Add Pass默认没有阴影，可以使用#pragma multi_compile_fwdadd_fullshadows为点光源和聚光灯开启阴影。</p>
+</li>
+<li><p>Add Pass中需要开启混合模式，否则会覆盖,一般选择Blend One One</p>
+</li>
+</ul>
+<h3 id="内置的光照变量和函数"><a href="#内置的光照变量和函数" class="headerlink" title="内置的光照变量和函数"></a>内置的光照变量和函数</h3><p>向前渲染可以使用的内置光照变量</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">名称</th>
+<th style="text-align:center">类型</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">_LightColor0</td>
+<td style="text-align:center">float4</td>
+<td style="text-align:center">逐像素光源颜色</td>
+</tr>
+<tr>
+<td style="text-align:center">_WorldSpaceLightPos0</td>
+<td style="text-align:center">float4</td>
+<td style="text-align:center">_WorldSpaceLightPos0.xyz是光源位置，如果是平行光,_WorldSpaceLightPos0.w为0,否则为1</td>
+</tr>
+<tr>
+<td style="text-align:center">_LightMatrix0</td>
+<td style="text-align:center">float4x4</td>
+<td style="text-align:center">世界空间到光源空间的变换矩阵，可以用于采样cookie和光强衰减纹理</td>
+</tr>
+<tr>
+<td style="text-align:center">unity_4LightPosX0,unity_4LightPosY0,unity_4LightPosZ0,</td>
+<td style="text-align:center">float4</td>
+<td style="text-align:center">仅用于base pass，前4个非重要点光源在世界空间的位置</td>
+</tr>
+<tr>
+<td style="text-align:center">unity_4LightAtten0</td>
+<td style="text-align:center">float4</td>
+<td style="text-align:center">仅用于base pass，前4个非重要点光源的衰减因子</td>
+</tr>
+<tr>
+<td style="text-align:center">unity_LightColor</td>
+<td style="text-align:center">half4[4]</td>
+<td style="text-align:center">仅用于base pass，前4个非重要点光源的颜色</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>向前渲染的内置光照函数</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>函数名</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>float3 WorldSpaceLightDir(float4 v)</td>
+<td>仅向前渲染，输入模型空间的顶点位置，返回世界空间中 点到光源的方向，未归一</td>
+</tr>
+<tr>
+<td>float3 UnityWorldSpaceLightDir(float4 v)</td>
+<td>仅向前渲染，输入世界空间的顶点位置，返回世界空间中 点到光源的方向，未归一</td>
+</tr>
+<tr>
+<td>float3 ObjSpaceLightDir(float4 v)</td>
+<td>仅向前渲染，输入模型空间的顶点位置，返回模型空间中 点到光源的方向，未归一</td>
+</tr>
+<tr>
+<td>float3 Shade4PointLights(…)</td>
+<td>仅向前渲染,计算4个点光源的光照。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="延迟渲染路径（Deferred-Rendering-Path）"><a href="#延迟渲染路径（Deferred-Rendering-Path）" class="headerlink" title="延迟渲染路径（Deferred Rendering Path）"></a>延迟渲染路径（Deferred Rendering Path）</h2><p>unity 5.0后新的延迟渲染替代旧的延迟渲染</p>
+<p>原理：包含两个pass</p>
+<p>第一个pass：只执行一次，不进行光照计算，仅计算可见性，通过深度缓冲技术实现。如果可见，则将各类信息存入G缓冲当中。</p>
+<p>第二个pass利用G缓冲的信息，进行真正的光照。</p>
+<p>延迟渲染的效率不依赖场景的复杂度，而是与屏幕空间的大小有关。</p>
+<h3 id="unity中的延迟渲染"><a href="#unity中的延迟渲染" class="headerlink" title="unity中的延迟渲染"></a>unity中的延迟渲染</h3><p>适合场景光源较多的情况，如果使用向前渲染会造成性能瓶颈。</p>
+<p>每个光源都可以当做逐像素处理。</p>
+<p>缺点：</p>
+<ul>
+<li>不支持真正的抗锯齿</li>
+<li>不能处理半透明</li>
+<li>对显卡有要求：支持MRT,Shader Mode3.0以上，深度渲染纹理和双面模板缓冲。</li>
+</ul>
+<p>默认的G缓冲区包含</p>
+<ul>
+<li>RT0,格式为ARGB32,RGB用于存储漫反射颜色，A通道未利用</li>
+<li>RT1,格式为ARGB32,RGB用于存储高光反射颜色，A通道存放高光反射指数</li>
+<li>RT2,格式为ARGB2101010,RGB存放法线，A未利用</li>
+<li>RT3,格式为ARGB32（非HDR）或ARGBHalf(HDR)，用于存储自发光+lightmap+反射探针</li>
+<li>深度缓冲和模板缓冲</li>
+</ul>
+<p>可使用的内置变量</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">名称</th>
+<th style="text-align:center">格式</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">_LightColor</td>
+<td style="text-align:center">float4</td>
+<td style="text-align:center">光源颜色</td>
+</tr>
+<tr>
+<td style="text-align:center">_LightMatrix0</td>
+<td style="text-align:center">float4x4</td>
+<td style="text-align:center">世界空间到光源空间的变换矩阵，用于采样cookie和光照衰减纹理</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="顶点照明路径（Vertex-Lit-Rendering-Path）"><a href="#顶点照明路径（Vertex-Lit-Rendering-Path）" class="headerlink" title="顶点照明路径（Vertex Lit Rendering Path）"></a>顶点照明路径（Vertex Lit Rendering Path）</h2><p>unity 5.0后被抛弃</p>
+<p>配置要求最少，性能最高，效果最差。P185</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="http://yrain11.com">YRain</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://yrain11.com/posts/4f764081.html">http://yrain11.com/posts/4f764081.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://yrain11.com" target="_blank">雨夜</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/ShaderLab/">ShaderLab</a><a class="post-meta__tags" href="/tags/unity/">unity</a><a class="post-meta__tags" href="/tags/%E6%B8%B2%E6%9F%93%E8%B7%AF%E5%BE%84/">渲染路径</a></div><div class="post_share"><div class="social-share" data-image="https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/93a5249d.html" title="Unity光照衰减"><img class="cover" src="https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Unity光照衰减</div></div></a></div><div class="next-post pull-right"><a href="/posts/c6377d6.html" title="Unity阴影"><img class="cover" src="https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Unity阴影</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/3765f5c1.html" title="顶点动画"><img class="cover" src="https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-09</div><div class="title">顶点动画</div></div></a></div><div><a href="/posts/4055e175.html" title="常用函数接口"><img class="cover" src="https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-09</div><div class="title">常用函数接口</div></div></a></div><div><a href="/posts/6f2d2584.html" title="Unity光源类型"><img class="cover" src="https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-09</div><div class="title">Unity光源类型</div></div></a></div><div><a href="/posts/93a5249d.html" title="Unity光照衰减"><img class="cover" src="https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-09</div><div class="title">Unity光照衰减</div></div></a></div><div><a href="/posts/c6377d6.html" title="Unity阴影"><img class="cover" src="https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-09</div><div class="title">Unity阴影</div></div></a></div><div><a href="/posts/13d813c7.html" title="双面渲染的透明效果"><img class="cover" src="https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-09</div><div class="title">双面渲染的透明效果</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/xier.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">YRain</div><div class="author-info__description">别被大雨湿了心</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">40</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">11</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/yrneversaygiveup" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:13732224484yr@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%B8%B2%E6%9F%93%E8%B7%AF%E5%BE%84%EF%BC%88rendering-path%EF%BC%89"><span class="toc-number">1.</span> <span class="toc-text">什么是渲染路径（rendering path）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%91%E5%89%8D%E6%B8%B2%E6%9F%93%E8%B7%AF%E5%BE%84%EF%BC%88Foward-Rendering-Path%EF%BC%89"><span class="toc-number">1.1.</span> <span class="toc-text">向前渲染路径（Foward Rendering Path）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#unity%E6%B8%B2%E6%9F%93%E4%BC%98%E5%85%88%E7%BA%A7"><span class="toc-number">1.1.1.</span> <span class="toc-text">unity渲染优先级</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E7%A7%8Dpass%E7%9A%84%E6%A0%87%E7%AD%BE%E5%92%8C%E6%B8%B2%E6%9F%93%E8%AE%BE%E7%BD%AE%E4%BB%A5%E5%8F%8A%E5%B8%B8%E8%A7%84%E5%85%89%E7%85%A7%E8%AE%A1%E7%AE%97"><span class="toc-number">1.1.2.</span> <span class="toc-text">两种pass的标签和渲染设置以及常规光照计算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E7%BD%AE%E7%9A%84%E5%85%89%E7%85%A7%E5%8F%98%E9%87%8F%E5%92%8C%E5%87%BD%E6%95%B0"><span class="toc-number">1.1.3.</span> <span class="toc-text">内置的光照变量和函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BB%B6%E8%BF%9F%E6%B8%B2%E6%9F%93%E8%B7%AF%E5%BE%84%EF%BC%88Deferred-Rendering-Path%EF%BC%89"><span class="toc-number">1.2.</span> <span class="toc-text">延迟渲染路径（Deferred Rendering Path）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#unity%E4%B8%AD%E7%9A%84%E5%BB%B6%E8%BF%9F%E6%B8%B2%E6%9F%93"><span class="toc-number">1.2.1.</span> <span class="toc-text">unity中的延迟渲染</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B6%E7%82%B9%E7%85%A7%E6%98%8E%E8%B7%AF%E5%BE%84%EF%BC%88Vertex-Lit-Rendering-Path%EF%BC%89"><span class="toc-number">1.3.</span> <span class="toc-text">顶点照明路径（Vertex Lit Rendering Path）</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/4055e175.html" title="常用函数接口"><img src="https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="常用函数接口"/></a><div class="content"><a class="title" href="/posts/4055e175.html" title="常用函数接口">常用函数接口</a><time datetime="2023-09-09T01:15:35.000Z" title="发表于 2023-09-09 09:15:35">2023-09-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/15a2f545.html" title="7.1 单张纹理"><img src="https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="7.1 单张纹理"/></a><div class="content"><a class="title" href="/posts/15a2f545.html" title="7.1 单张纹理">7.1 单张纹理</a><time datetime="2023-09-09T01:15:35.000Z" title="发表于 2023-09-09 09:15:35">2023-09-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/529bf6c6.html" title="7.2 凹凸纹理"><img src="https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="7.2 凹凸纹理"/></a><div class="content"><a class="title" href="/posts/529bf6c6.html" title="7.2 凹凸纹理">7.2 凹凸纹理</a><time datetime="2023-09-09T01:15:35.000Z" title="发表于 2023-09-09 09:15:35">2023-09-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/ac8870a9.html" title="7.3 渐变纹理"><img src="https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="7.3 渐变纹理"/></a><div class="content"><a class="title" href="/posts/ac8870a9.html" title="7.3 渐变纹理">7.3 渐变纹理</a><time datetime="2023-09-09T01:15:35.000Z" title="发表于 2023-09-09 09:15:35">2023-09-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/79c6506a.html" title="7.4 遮罩纹理"><img src="https://gitee.com/yurain11/drawing-bed/raw/master/blog/fengmian1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="7.4 遮罩纹理"/></a><div class="content"><a class="title" href="/posts/79c6506a.html" title="7.4 遮罩纹理">7.4 遮罩纹理</a><time datetime="2023-09-09T01:15:35.000Z" title="发表于 2023-09-09 09:15:35">2023-09-09</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By YRain</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script></div><div class="aplayer no-destroy" data-id="8725969824" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="true"> </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div class="no-result" id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
