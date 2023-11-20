@@ -114,33 +114,6 @@
     
     
     <entry>
-      <title>7.4 遮罩纹理</title>
-      <link href="/posts/79c6506a.html"/>
-      <url>/posts/79c6506a.html</url>
-      
-        <content type="html"><![CDATA[<h1 id="遮罩纹理"><a href="#遮罩纹理" class="headerlink" title="遮罩纹理"></a>遮罩纹理</h1><p>用来保护某些区域避免被修改</p><p>原理：使用其中的通道与原图相乘，如果通道值为0，则不受影响。</p><p>比如说想要控制高光，就制作一张高光的遮罩图，通过与原图相乘，来控制该遮罩图在原图上的影响大小，用来调出想要的高光。</p><pre><code class="lang-c">// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 7/Mask Texture&quot; &#123;    Properties &#123;        _Color (&quot;Color Tint&quot;, Color) = (1, 1, 1, 1)        _MainTex (&quot;Main Tex&quot;, 2D) = &quot;white&quot; &#123;&#125;        _BumpMap (&quot;Normal Map&quot;, 2D) = &quot;bump&quot; &#123;&#125;        _BumpScale(&quot;Bump Scale&quot;, Float) = 1.0        //高光遮罩        _SpecularMask (&quot;Specular Mask&quot;, 2D) = &quot;white&quot; &#123;&#125;        _SpecularScale (&quot;Specular Scale&quot;, Float) = 1.0        _Specular (&quot;Specular&quot;, Color) = (1, 1, 1, 1)        _Gloss (&quot;Gloss&quot;, Range(8.0, 256)) = 20    &#125;    SubShader &#123;        Pass &#123;             Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            CGPROGRAM            #pragma vertex vert            #pragma fragment frag            #include &quot;Lighting.cginc&quot;            fixed4 _Color;            sampler2D _MainTex;            float4 _MainTex_ST;            sampler2D _BumpMap;            float _BumpScale;            sampler2D _SpecularMask;            float _SpecularScale;            fixed4 _Specular;            float _Gloss;            struct a2v &#123;                float4 vertex : POSITION;                float3 normal : NORMAL;                float4 tangent : TANGENT;                float4 texcoord : TEXCOORD0;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float2 uv : TEXCOORD0;                float3 lightDir: TEXCOORD1;                float3 viewDir : TEXCOORD2;            &#125;;            v2f vert(a2v v) &#123;                v2f o;                o.pos = UnityObjectToClipPos(v.vertex);                o.uv.xy = v.texcoord.xy * _MainTex_ST.xy + _MainTex_ST.zw;                //使用了宏                TANGENT_SPACE_ROTATION;                o.lightDir = mul(rotation, ObjSpaceLightDir(v.vertex)).xyz;                o.viewDir = mul(rotation, ObjSpaceViewDir(v.vertex)).xyz;                return o;            &#125;            fixed4 frag(v2f i) : SV_Target &#123;                 fixed3 tangentLightDir = normalize(i.lightDir);                fixed3 tangentViewDir = normalize(i.viewDir);                fixed3 tangentNormal = UnpackNormal(tex2D(_BumpMap, i.uv));                tangentNormal.xy *= _BumpScale;                tangentNormal.z = sqrt(1.0 - saturate(dot(tangentNormal.xy, tangentNormal.xy)));                fixed3 albedo = tex2D(_MainTex, i.uv).rgb * _Color.rgb;                fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;                fixed3 diffuse = _LightColor0.rgb * albedo * max(0, dot(tangentNormal, tangentLightDir));                 fixed3 halfDir = normalize(tangentLightDir + tangentViewDir);                 // Get the mask value                 fixed specularMask = tex2D(_SpecularMask, i.uv).r * _SpecularScale;                 // Compute specular term with the specular mask                 fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(max(0, dot(tangentNormal, halfDir)), _Gloss) * specularMask;                return fixed4(ambient + diffuse + specular, 1.0);            &#125;            ENDCG        &#125;    &#125;     FallBack &quot;Specular&quot;&#125;</code></pre><p>重复利用遮罩：把不同属性存储在图片不同通道中，已到达更好的效果。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> unity shader 入门精要总结 </category>
-          
-          <category> 第七章：基础纹理 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> ShaderLab </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>纹理属性</title>
       <link href="/posts/fae112f7.html"/>
       <url>/posts/fae112f7.html</url>
@@ -170,126 +143,18 @@
     
     
     <entry>
-      <title>Debug</title>
-      <link href="/posts/ad6468a3.html"/>
-      <url>/posts/ad6468a3.html</url>
+      <title>7.4 遮罩纹理</title>
+      <link href="/posts/79c6506a.html"/>
+      <url>/posts/79c6506a.html</url>
       
-        <content type="html"><![CDATA[<h1 id="使用假彩色图像"><a href="#使用假彩色图像" class="headerlink" title="使用假彩色图像"></a>使用假彩色图像</h1><p>主要思想：把需要调试的变量映射到0-1，作为颜色输出到屏幕</p><p><code>c#</code></p><h1 id="使用VS"><a href="#使用VS" class="headerlink" title="使用VS"></a>使用VS</h1><p>Graphics Debugger</p><h1 id="帧调试器（Frame-Debugger）"><a href="#帧调试器（Frame-Debugger）" class="headerlink" title="帧调试器（Frame Debugger）"></a>帧调试器（Frame Debugger）</h1><p>window-frame debugger</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> unity shader 入门精要总结 </category>
-          
-          <category> 第五章 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> ShaderLab </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Unity内置文件和变量</title>
-      <link href="/posts/e7a93b90.html"/>
-      <url>/posts/e7a93b90.html</url>
-      
-        <content type="html"><![CDATA[<h1 id="内置文件"><a href="#内置文件" class="headerlink" title="内置文件"></a>内置文件</h1><ul><li>后缀为.cginc</li><li>路径：安装位置/Data/CGIncludes</li></ul><div class="table-container"><table><thead><tr><th style="text-align:center">文件名</th><th style="text-align:center">描述</th></tr></thead><tbody><tr><td style="text-align:center">UnityCG.cginc</td><td style="text-align:center">包含最常使用的帮助函数、宏和结构体</td></tr><tr><td style="text-align:center">UnityShaderVariables.cginc</td><td style="text-align:center">编译时会自动包含，包括许多内置的全局变量，比如UNITY_MATRIX_MVP</td></tr><tr><td style="text-align:center">Lighting.cginc</td><td style="text-align:center">包含内置光照模型，编写surface shader会自动包含</td></tr><tr><td style="text-align:center">HLSLSupport.cginc</td><td style="text-align:center">编译时会自动包含，生命很多跨平台的宏和定义</td></tr></tbody></table></div><ul><li><p>UnityCG.cginc常用结构体</p><p>|     名称     |      描述      |              包含的变量              |<br>| :—————: | :——————: | :—————————————————: |<br>| appdata_base | 顶点着色器输入 |    顶点位置，法线，第一组纹理坐标    |<br>| appdata_tan  | 顶点着色器输入 | 顶点位置，法线，切线，第一组纹理坐标 |<br>| appdata_full | 顶点着色器输入 |  顶点位置，法线，切线，四组纹理坐标  |<br>| appdata_img  | 顶点着色器输入 |       顶点位置，第一组纹理坐标       |<br>|   v2f_img    | 顶点着色器输出 |   裁剪空间位置，texcoord0纹理坐标    |</p></li><li><p>UnityCG.cginc常用帮助函数</p><p>|                    函数名                    |                             描述                             |<br>| :—————————————————————: | :—————————————————————————————: |<br>| float3 （Unity）WorldSpaceViewDir(float4 v)  | 输入：模型空间顶点位置。输出：世界空间下该点到摄像机的观察方向 |<br>|       float3 ObjSpaceViewDir(float4 v)       | 输入：模型空间顶点位置。输出：模型空间下该点到摄像机的观察方向 |<br>| float3 （Unity）WorldSpaceLightDir(float4 v) | <strong>只能用于向前渲染（forward）</strong>，输入模型空间的顶点位置，返回世界空间该点到光源的光照方向，未归一化。 |<br>|      float3 ObjSpaceLightDir(float4 v)       | <strong>只能用于向前渲染（forward）</strong>，输入模型空间的顶点位置，返回模型空间该点到光源的光照方向，未归一化。 |<br>| float3 UnityObjectToWorldNormal(float3 norm) |             把法线方向从模型空间转换到世界空间中             |<br>|   float3 UnityObjectToWorldDir(float3 dir)   |             把方向向量从模型空间变换到世界空间中             |<br>|   float3 UnityWorldToObjectDir(float3 dir)   |             把方向向量从世界空间变换到模型空间中             |</p></li></ul>]]></content>
+        <content type="html"><![CDATA[<h1 id="遮罩纹理"><a href="#遮罩纹理" class="headerlink" title="遮罩纹理"></a>遮罩纹理</h1><p>用来保护某些区域避免被修改</p><p>原理：使用其中的通道与原图相乘，如果通道值为0，则不受影响。</p><p>比如说想要控制高光，就制作一张高光的遮罩图，通过与原图相乘，来控制该遮罩图在原图上的影响大小，用来调出想要的高光。</p><pre><code class="lang-c">// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 7/Mask Texture&quot; &#123;    Properties &#123;        _Color (&quot;Color Tint&quot;, Color) = (1, 1, 1, 1)        _MainTex (&quot;Main Tex&quot;, 2D) = &quot;white&quot; &#123;&#125;        _BumpMap (&quot;Normal Map&quot;, 2D) = &quot;bump&quot; &#123;&#125;        _BumpScale(&quot;Bump Scale&quot;, Float) = 1.0        //高光遮罩        _SpecularMask (&quot;Specular Mask&quot;, 2D) = &quot;white&quot; &#123;&#125;        _SpecularScale (&quot;Specular Scale&quot;, Float) = 1.0        _Specular (&quot;Specular&quot;, Color) = (1, 1, 1, 1)        _Gloss (&quot;Gloss&quot;, Range(8.0, 256)) = 20    &#125;    SubShader &#123;        Pass &#123;             Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            CGPROGRAM            #pragma vertex vert            #pragma fragment frag            #include &quot;Lighting.cginc&quot;            fixed4 _Color;            sampler2D _MainTex;            float4 _MainTex_ST;            sampler2D _BumpMap;            float _BumpScale;            sampler2D _SpecularMask;            float _SpecularScale;            fixed4 _Specular;            float _Gloss;            struct a2v &#123;                float4 vertex : POSITION;                float3 normal : NORMAL;                float4 tangent : TANGENT;                float4 texcoord : TEXCOORD0;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float2 uv : TEXCOORD0;                float3 lightDir: TEXCOORD1;                float3 viewDir : TEXCOORD2;            &#125;;            v2f vert(a2v v) &#123;                v2f o;                o.pos = UnityObjectToClipPos(v.vertex);                o.uv.xy = v.texcoord.xy * _MainTex_ST.xy + _MainTex_ST.zw;                //使用了宏                TANGENT_SPACE_ROTATION;                o.lightDir = mul(rotation, ObjSpaceLightDir(v.vertex)).xyz;                o.viewDir = mul(rotation, ObjSpaceViewDir(v.vertex)).xyz;                return o;            &#125;            fixed4 frag(v2f i) : SV_Target &#123;                 fixed3 tangentLightDir = normalize(i.lightDir);                fixed3 tangentViewDir = normalize(i.viewDir);                fixed3 tangentNormal = UnpackNormal(tex2D(_BumpMap, i.uv));                tangentNormal.xy *= _BumpScale;                tangentNormal.z = sqrt(1.0 - saturate(dot(tangentNormal.xy, tangentNormal.xy)));                fixed3 albedo = tex2D(_MainTex, i.uv).rgb * _Color.rgb;                fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;                fixed3 diffuse = _LightColor0.rgb * albedo * max(0, dot(tangentNormal, tangentLightDir));                 fixed3 halfDir = normalize(tangentLightDir + tangentViewDir);                 // Get the mask value                 fixed specularMask = tex2D(_SpecularMask, i.uv).r * _SpecularScale;                 // Compute specular term with the specular mask                 fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(max(0, dot(tangentNormal, halfDir)), _Gloss) * specularMask;                return fixed4(ambient + diffuse + specular, 1.0);            &#125;            ENDCG        &#125;    &#125;     FallBack &quot;Specular&quot;&#125;</code></pre><p>重复利用遮罩：把不同属性存储在图片不同通道中，已到达更好的效果。</p>]]></content>
       
       
       <categories>
           
           <category> unity shader 入门精要总结 </category>
           
-          <category> 第五章 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> ShaderLab </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>shader编写规范</title>
-      <link href="/posts/786c70b1.html"/>
-      <url>/posts/786c70b1.html</url>
-      
-        <content type="html"><![CDATA[<h1 id="float-half-fixed"><a href="#float-half-fixed" class="headerlink" title="float half fixed"></a>float half fixed</h1><div class="table-container"><table><thead><tr><th style="text-align:center">类型</th><th style="text-align:center">精度</th></tr></thead><tbody><tr><td style="text-align:center">float</td><td style="text-align:center">最高精度浮点值，32位</td></tr><tr><td style="text-align:center">half</td><td style="text-align:center">中等精度，16位，-60000~+60000</td></tr><tr><td style="text-align:center">fixed</td><td style="text-align:center">最低精度，11位，-2.0~+2.0</td></tr></tbody></table></div><ul><li>不同的值请选择不同的精度类型，减少内存的消耗</li></ul><h1 id="避免不必要的计算"><a href="#避免不必要的计算" class="headerlink" title="避免不必要的计算"></a>避免不必要的计算</h1><ul><li>不同的Shader Target,不同的着色器阶段，可以使用的临时寄存器和指令数目是不同的。</li></ul><div class="table-container"><table><thead><tr><th style="text-align:center">指令</th><th style="text-align:center">描述</th></tr></thead><tbody><tr><td style="text-align:center">#pragma target 2.0（Direct3D  Shader Model 2.0）</td><td style="text-align:center">默认等级，不支持顶点纹理采样，不支持显示的LOD纹理采样</td></tr><tr><td style="text-align:center">#pragma target 3.0（Direct3D  Shader Model 3.0）</td><td style="text-align:center">支持顶点纹理采样</td></tr><tr><td style="text-align:center">#pragma target 4.0（Direct3D  Shader Model 4.0）</td><td style="text-align:center">支持几何着色器</td></tr><tr><td style="text-align:center">#pragma target 5.0（Direct3D  Shader Model 5  .0）</td></tr></tbody></table></div><h1 id="慎用分支和循环语句"><a href="#慎用分支和循环语句" class="headerlink" title="慎用分支和循环语句"></a>慎用分支和循环语句</h1><ul><li><p>不鼓励在shader中使用流程控制语句，会降低GPU并行处理操作</p></li><li><p>如果大量使用，要把该使用尽量放在流水线上端</p></li><li>分支判断中的条件变量最好是常数，即不发生变化</li><li>每个分支包含的操作指令少</li><li>分支的嵌套数少</li></ul><h1 id="不要除以0"><a href="#不要除以0" class="headerlink" title="不要除以0"></a>不要除以0</h1><ul><li>对除数可能为0的情况，强制截取到非0</li><li>使用很小的浮点数保证分母大于0</li></ul>]]></content>
-      
-      
-      <categories>
-          
-          <category> unity shader 入门精要总结 </category>
-          
-          <category> 第五章 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> ShaderLab </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>UnityShader结构</title>
-      <link href="/posts/8204bd5a.html"/>
-      <url>/posts/8204bd5a.html</url>
-      
-        <content type="html"><![CDATA[<h1 id="第一个代码学习"><a href="#第一个代码学习" class="headerlink" title="第一个代码学习"></a>第一个代码学习</h1><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;//开头引号内存放路径Shader &quot;MyShader/BaseShader&quot;&#123;    //属性栏    Properties&#123;        //声明一个Color类型属性        _Color(&quot;Color Tint&quot;,Color)=(1.0,1.0,1.0,1.0)    &#125;    SubShader&#123;        Pass&#123;            CGPROGRAM            //告诉unity定义了vert和frag：顶点和片元着色器            #pragma vertex vert            #pragma fragment frag            //在Cg代码中需要定义一个与属性名称和类型都匹配的变量            fixed4 _Color;            //定义一个结构体来定义顶点着色器的输出            struct a2v&#123;                //存放顶点位置                float4 vertex:POSITION;                //存放法线                float3 normal:NORMAL;                //用第0个纹理填充texcoord                float4 texcoord:TEXCOORD0;            &#125;;            //使用一个结构体定义顶点着色器的输出            struct v2f&#123;                //把裁剪空间下的顶点坐标存放在pos                float4 pos:SV_POSITION;                //color用来存放颜色信息                fixed3 color:COLOR0;            &#125;;            //输入v:POSITION输入顶点位置，返回一个float4的变量            //SV_POSITION：表示输出的是裁剪空间的坐标,返回一个v2f的结构体            v2f vert(a2v v) &#123;            //定义需要传出的变量            v2f o;            o.pos=UnityObjectToClipPos(v.vertex);            o.color=v.normal*0.5+fixed3(0.5,0.5,0.5);            return o;        &#125;            //返回一个fixed4变量，SV_Target把输出的颜色输出到渲染目标中            fixed4 frag(v2f i) : SV_Target&#123;                fixed3 c=i.color;                c*=_Color.rgb;                return fixed4(c,1.0);            &#125;        ENDCG    &#125;    &#125;&#125;</code></pre><ul><li><p>属性表</p><p>| ShaderLab属性类型 |     Cg变量类型      |<br>| :———————-: | :————————-: |<br>|   Color,Vector    | float4,half4,fixed4 |<br>|    Range,Float    |  float,half,fixed   |<br>|        2D         |      sampler2D      |<br>|       Cube        |     samplerCube     |<br>|        3D         |      sampler3D      |</p></li><li><p>Cg变量前可能有uniform，可以省略</p></li></ul>]]></content>
-      
-      
-      <categories>
-          
-          <category> unity shader 入门精要总结 </category>
-          
-          <category> 第五章 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> ShaderLab </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>语义</title>
-      <link href="/posts/92ba7da.html"/>
-      <url>/posts/92ba7da.html</url>
-      
-        <content type="html"><![CDATA[<h1 id="什么是语义"><a href="#什么是语义" class="headerlink" title="什么是语义"></a>什么是语义</h1><ul><li>语义是赋给shader输入和输出的字符串，即语义可以让shader知道从哪读取数据，并把数据输入到哪。</li><li>语义出现的位置 不同，含义也不同。</li></ul><h1 id="系统数值语义"><a href="#系统数值语义" class="headerlink" title="系统数值语义"></a>系统数值语义</h1><ul><li>以SV开头</li><li>不可以被随便赋值：需要完成特定的目的</li></ul><h1 id="Unity支持的语义"><a href="#Unity支持的语义" class="headerlink" title="Unity支持的语义"></a>Unity支持的语义</h1><h2 id="a2v"><a href="#a2v" class="headerlink" title="a2v"></a>a2v</h2><div class="table-container"><table><thead><tr><th style="text-align:center">语义</th><th style="text-align:center">描述</th></tr></thead><tbody><tr><td style="text-align:center">POSITION</td><td style="text-align:center">模型空间的顶点位置，通常是float4类型</td></tr><tr><td style="text-align:center">NORMAL</td><td style="text-align:center">顶点法线，float3</td></tr><tr><td style="text-align:center">TANGENT</td><td style="text-align:center">顶点切线，float4</td></tr><tr><td style="text-align:center">TEXCOORDn</td><td style="text-align:center">该顶点的纹理坐标，通常是float2或者float4</td></tr><tr><td style="text-align:center">COLOR</td><td style="text-align:center">顶点颜色，fixed4或者float4</td></tr></tbody></table></div><h2 id="v2f"><a href="#v2f" class="headerlink" title="v2f"></a>v2f</h2><div class="table-container"><table><thead><tr><th style="text-align:center">语义</th><th style="text-align:center">描述</th></tr></thead><tbody><tr><td style="text-align:center">SV_POSITION</td><td style="text-align:center">裁剪空间的顶点坐标，必须被包含</td></tr><tr><td style="text-align:center">COLOR0</td><td style="text-align:center">输出第一组顶点颜色（不是必须）</td></tr><tr><td style="text-align:center">COLOR1</td><td style="text-align:center">输出第二组顶点颜色（不是必须）</td></tr><tr><td style="text-align:center">TEXCOOORD0-7</td><td style="text-align:center">输出纹理坐标，不是必须</td></tr></tbody></table></div><h2 id="OUT"><a href="#OUT" class="headerlink" title="OUT"></a>OUT</h2><div class="table-container"><table><thead><tr><th style="text-align:center">语义</th><th style="text-align:center">描述</th></tr></thead><tbody><tr><td style="text-align:center">SV_Target</td><td style="text-align:center">会将输出值存储到渲染目标中。</td></tr></tbody></table></div>]]></content>
-      
-      
-      <categories>
-          
-          <category> unity shader 入门精要总结 </category>
-          
-          <category> 第五章 </category>
+          <category> 第七章：基础纹理 </category>
           
       </categories>
       
@@ -310,37 +175,6 @@
       <url>/posts/6f2d2584.html</url>
       
         <content type="html"><![CDATA[<h1 id="光源"><a href="#光源" class="headerlink" title="光源"></a>光源</h1><ul><li>平行光</li><li>点光源</li><li>聚光灯d</li></ul><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;_LightMatrix0&#39; with &#39;unity_WorldToLight&#39;// Upgrade NOTE: replaced &#39;_Object2World&#39; with &#39;unity_ObjectToWorld&#39;// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 9/Forward Rendering&quot; &#123;    Properties &#123;        _Diffuse (&quot;Diffuse&quot;, Color) = (1, 1, 1, 1)        _Specular (&quot;Specular&quot;, Color) = (1, 1, 1, 1)        _Gloss (&quot;Gloss&quot;, Range(8.0, 256)) = 20    &#125;    SubShader &#123;        Tags &#123; &quot;RenderType&quot;=&quot;Opaque&quot; &#125;        Pass &#123;            // Pass for ambient light &amp; first pixel light (directional light)            Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            CGPROGRAM            // Apparently need to add this declaration             #pragma multi_compile_fwdbase                #pragma vertex vert            #pragma fragment frag            #include &quot;Lighting.cginc&quot;            fixed4 _Diffuse;            fixed4 _Specular;            float _Gloss;            struct a2v &#123;                float4 vertex : POSITION;                float3 normal : NORMAL;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float3 worldNormal : TEXCOORD0;                float3 worldPos : TEXCOORD1;            &#125;;            v2f vert(a2v v) &#123;                v2f o;                o.pos = UnityObjectToClipPos(v.vertex);                o.worldNormal = UnityObjectToWorldNormal(v.normal);                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;                return o;            &#125;            fixed4 frag(v2f i) : SV_Target &#123;                fixed3 worldNormal = normalize(i.worldNormal);                fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);                fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;                 fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * max(0, dot(worldNormal, worldLightDir));                 fixed3 viewDir = normalize(_WorldSpaceCameraPos.xyz - i.worldPos.xyz);                 fixed3 halfDir = normalize(worldLightDir + viewDir);                 fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(max(0, dot(worldNormal, halfDir)), _Gloss);                fixed atten = 1.0;                return fixed4(ambient + (diffuse + specular) * atten, 1.0);            &#125;            ENDCG        &#125;        Pass &#123;            // Pass for other pixel lights            Tags &#123; &quot;LightMode&quot;=&quot;ForwardAdd&quot; &#125;            Blend One One            CGPROGRAM            // Apparently need to add this declaration            #pragma multi_compile_fwdadd            #pragma vertex vert            #pragma fragment frag            #include &quot;Lighting.cginc&quot;            #include &quot;AutoLight.cginc&quot;            fixed4 _Diffuse;            fixed4 _Specular;            float _Gloss;            struct a2v &#123;                float4 vertex : POSITION;                float3 normal : NORMAL;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float3 worldNormal : TEXCOORD0;                float3 worldPos : TEXCOORD1;            &#125;;            v2f vert(a2v v) &#123;                v2f o;                o.pos = UnityObjectToClipPos(v.vertex);                o.worldNormal = UnityObjectToWorldNormal(v.normal);                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;                return o;            &#125;            fixed4 frag(v2f i) : SV_Target &#123;                fixed3 worldNormal = normalize(i.worldNormal);                //判断光源类型，如果是平行光，则，不是的则                #ifdef USING_DIRECTIONAL_LIGHT                    fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);                #else                    fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz - i.worldPos.xyz);                #endif                fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * max(0, dot(worldNormal, worldLightDir));                fixed3 viewDir = normalize(_WorldSpaceCameraPos.xyz - i.worldPos.xyz);                fixed3 halfDir = normalize(worldLightDir + viewDir);                fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(max(0, dot(worldNormal, halfDir)), _Gloss);                #ifdef USING_DIRECTIONAL_LIGHT                    fixed atten = 1.0;                #else                    #if defined (POINT)                    //转换到光源空间计算衰减                        float3 lightCoord = mul(unity_WorldToLight, float4(i.worldPos, 1)).xyz;                        fixed atten = tex2D(_LightTexture0, dot(lightCoord, lightCoord).rr).UNITY_ATTEN_CHANNEL;                    #elif defined (SPOT)                        float4 lightCoord = mul(unity_WorldToLight, float4(i.worldPos, 1));                        fixed atten = (lightCoord.z &gt; 0) * tex2D(_LightTexture0, lightCoord.xy / lightCoord.w + 0.5).w * tex2D(_LightTextureB0, dot(lightCoord, lightCoord).rr).UNITY_ATTEN_CHANNEL;                    #else                        fixed atten = 1.0;                    #endif                #endif                return fixed4((diffuse + specular) * atten, 1.0);            &#125;            ENDCG        &#125;    &#125;    FallBack &quot;Specular&quot;&#125;</code></pre><p>unity处理点光源的顺序按照重要度排序，重要度取决于距离物体的远近，光源颜色，强度等。当物体不在光的范围内时则会不调用pass。渲染可以查看帧调试器frame Debugger</p><p><img src="https://gitee.com/yurain11/drawing-bed/raw/master/img/202304091424999.png" alt="image-20230409142450877"></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> unity shader 入门精要总结 </category>
-          
-          <category> 第九章：更复杂的光照 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> ShaderLab </tag>
-            
-            <tag> unity </tag>
-            
-            <tag> 光照 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Unity光照衰减</title>
-      <link href="/posts/93a5249d.html"/>
-      <url>/posts/93a5249d.html</url>
-      
-        <content type="html"><![CDATA[<h1 id="使用纹理作为插值表"><a href="#使用纹理作为插值表" class="headerlink" title="使用纹理作为插值表"></a>使用纹理作为插值表</h1><p>优点：采样即可，可以提升性能，适用于大部分场景。</p><p>缺点：</p><ul><li>需要预处理得到采样纹理，纹理大小会影响衰减的精度</li><li>不直观和不方便，无法使用其他数学公式来计算衰减。</li></ul><h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><p>只关心对角线上的衰减值。</p><ul><li>先获得光源空间的位置，使用光源空间中顶点距离的平方采样，避开开方操作（理解：范围在0-1,平方的范围也在0-1）,使用.rr操作就是构建一二维数组,再使用UNITY_ATTEN_CHANNEL获得衰减纹理的分量值。</li></ul>]]></content>
       
       
       <categories>
@@ -421,6 +255,172 @@
             <tag> unity </tag>
             
             <tag> 阴影 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Unity光照衰减</title>
+      <link href="/posts/93a5249d.html"/>
+      <url>/posts/93a5249d.html</url>
+      
+        <content type="html"><![CDATA[<h1 id="使用纹理作为插值表"><a href="#使用纹理作为插值表" class="headerlink" title="使用纹理作为插值表"></a>使用纹理作为插值表</h1><p>优点：采样即可，可以提升性能，适用于大部分场景。</p><p>缺点：</p><ul><li>需要预处理得到采样纹理，纹理大小会影响衰减的精度</li><li>不直观和不方便，无法使用其他数学公式来计算衰减。</li></ul><h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><p>只关心对角线上的衰减值。</p><ul><li>先获得光源空间的位置，使用光源空间中顶点距离的平方采样，避开开方操作（理解：范围在0-1,平方的范围也在0-1）,使用.rr操作就是构建一二维数组,再使用UNITY_ATTEN_CHANNEL获得衰减纹理的分量值。</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> unity shader 入门精要总结 </category>
+          
+          <category> 第九章：更复杂的光照 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ShaderLab </tag>
+            
+            <tag> unity </tag>
+            
+            <tag> 光照 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Debug</title>
+      <link href="/posts/ad6468a3.html"/>
+      <url>/posts/ad6468a3.html</url>
+      
+        <content type="html"><![CDATA[<h1 id="使用假彩色图像"><a href="#使用假彩色图像" class="headerlink" title="使用假彩色图像"></a>使用假彩色图像</h1><p>主要思想：把需要调试的变量映射到0-1，作为颜色输出到屏幕</p><p><code>c#</code></p><h1 id="使用VS"><a href="#使用VS" class="headerlink" title="使用VS"></a>使用VS</h1><p>Graphics Debugger</p><h1 id="帧调试器（Frame-Debugger）"><a href="#帧调试器（Frame-Debugger）" class="headerlink" title="帧调试器（Frame Debugger）"></a>帧调试器（Frame Debugger）</h1><p>window-frame debugger</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> unity shader 入门精要总结 </category>
+          
+          <category> 第五章 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ShaderLab </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>shader编写规范</title>
+      <link href="/posts/786c70b1.html"/>
+      <url>/posts/786c70b1.html</url>
+      
+        <content type="html"><![CDATA[<h1 id="float-half-fixed"><a href="#float-half-fixed" class="headerlink" title="float half fixed"></a>float half fixed</h1><div class="table-container"><table><thead><tr><th style="text-align:center">类型</th><th style="text-align:center">精度</th></tr></thead><tbody><tr><td style="text-align:center">float</td><td style="text-align:center">最高精度浮点值，32位</td></tr><tr><td style="text-align:center">half</td><td style="text-align:center">中等精度，16位，-60000~+60000</td></tr><tr><td style="text-align:center">fixed</td><td style="text-align:center">最低精度，11位，-2.0~+2.0</td></tr></tbody></table></div><ul><li>不同的值请选择不同的精度类型，减少内存的消耗</li></ul><h1 id="避免不必要的计算"><a href="#避免不必要的计算" class="headerlink" title="避免不必要的计算"></a>避免不必要的计算</h1><ul><li>不同的Shader Target,不同的着色器阶段，可以使用的临时寄存器和指令数目是不同的。</li></ul><div class="table-container"><table><thead><tr><th style="text-align:center">指令</th><th style="text-align:center">描述</th></tr></thead><tbody><tr><td style="text-align:center">#pragma target 2.0（Direct3D  Shader Model 2.0）</td><td style="text-align:center">默认等级，不支持顶点纹理采样，不支持显示的LOD纹理采样</td></tr><tr><td style="text-align:center">#pragma target 3.0（Direct3D  Shader Model 3.0）</td><td style="text-align:center">支持顶点纹理采样</td></tr><tr><td style="text-align:center">#pragma target 4.0（Direct3D  Shader Model 4.0）</td><td style="text-align:center">支持几何着色器</td></tr><tr><td style="text-align:center">#pragma target 5.0（Direct3D  Shader Model 5  .0）</td></tr></tbody></table></div><h1 id="慎用分支和循环语句"><a href="#慎用分支和循环语句" class="headerlink" title="慎用分支和循环语句"></a>慎用分支和循环语句</h1><ul><li><p>不鼓励在shader中使用流程控制语句，会降低GPU并行处理操作</p></li><li><p>如果大量使用，要把该使用尽量放在流水线上端</p></li><li>分支判断中的条件变量最好是常数，即不发生变化</li><li>每个分支包含的操作指令少</li><li>分支的嵌套数少</li></ul><h1 id="不要除以0"><a href="#不要除以0" class="headerlink" title="不要除以0"></a>不要除以0</h1><ul><li>对除数可能为0的情况，强制截取到非0</li><li>使用很小的浮点数保证分母大于0</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> unity shader 入门精要总结 </category>
+          
+          <category> 第五章 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ShaderLab </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Unity内置文件和变量</title>
+      <link href="/posts/e7a93b90.html"/>
+      <url>/posts/e7a93b90.html</url>
+      
+        <content type="html"><![CDATA[<h1 id="内置文件"><a href="#内置文件" class="headerlink" title="内置文件"></a>内置文件</h1><ul><li>后缀为.cginc</li><li>路径：安装位置/Data/CGIncludes</li></ul><div class="table-container"><table><thead><tr><th style="text-align:center">文件名</th><th style="text-align:center">描述</th></tr></thead><tbody><tr><td style="text-align:center">UnityCG.cginc</td><td style="text-align:center">包含最常使用的帮助函数、宏和结构体</td></tr><tr><td style="text-align:center">UnityShaderVariables.cginc</td><td style="text-align:center">编译时会自动包含，包括许多内置的全局变量，比如UNITY_MATRIX_MVP</td></tr><tr><td style="text-align:center">Lighting.cginc</td><td style="text-align:center">包含内置光照模型，编写surface shader会自动包含</td></tr><tr><td style="text-align:center">HLSLSupport.cginc</td><td style="text-align:center">编译时会自动包含，生命很多跨平台的宏和定义</td></tr></tbody></table></div><ul><li><p>UnityCG.cginc常用结构体</p><p>|     名称     |      描述      |              包含的变量              |<br>| :—————: | :——————: | :—————————————————: |<br>| appdata_base | 顶点着色器输入 |    顶点位置，法线，第一组纹理坐标    |<br>| appdata_tan  | 顶点着色器输入 | 顶点位置，法线，切线，第一组纹理坐标 |<br>| appdata_full | 顶点着色器输入 |  顶点位置，法线，切线，四组纹理坐标  |<br>| appdata_img  | 顶点着色器输入 |       顶点位置，第一组纹理坐标       |<br>|   v2f_img    | 顶点着色器输出 |   裁剪空间位置，texcoord0纹理坐标    |</p></li><li><p>UnityCG.cginc常用帮助函数</p><p>|                    函数名                    |                             描述                             |<br>| :—————————————————————: | :—————————————————————————————: |<br>| float3 （Unity）WorldSpaceViewDir(float4 v)  | 输入：模型空间顶点位置。输出：世界空间下该点到摄像机的观察方向 |<br>|       float3 ObjSpaceViewDir(float4 v)       | 输入：模型空间顶点位置。输出：模型空间下该点到摄像机的观察方向 |<br>| float3 （Unity）WorldSpaceLightDir(float4 v) | <strong>只能用于向前渲染（forward）</strong>，输入模型空间的顶点位置，返回世界空间该点到光源的光照方向，未归一化。 |<br>|      float3 ObjSpaceLightDir(float4 v)       | <strong>只能用于向前渲染（forward）</strong>，输入模型空间的顶点位置，返回模型空间该点到光源的光照方向，未归一化。 |<br>| float3 UnityObjectToWorldNormal(float3 norm) |             把法线方向从模型空间转换到世界空间中             |<br>|   float3 UnityObjectToWorldDir(float3 dir)   |             把方向向量从模型空间变换到世界空间中             |<br>|   float3 UnityWorldToObjectDir(float3 dir)   |             把方向向量从世界空间变换到模型空间中             |</p></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> unity shader 入门精要总结 </category>
+          
+          <category> 第五章 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ShaderLab </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>UnityShader结构</title>
+      <link href="/posts/8204bd5a.html"/>
+      <url>/posts/8204bd5a.html</url>
+      
+        <content type="html"><![CDATA[<h1 id="第一个代码学习"><a href="#第一个代码学习" class="headerlink" title="第一个代码学习"></a>第一个代码学习</h1><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;//开头引号内存放路径Shader &quot;MyShader/BaseShader&quot;&#123;    //属性栏    Properties&#123;        //声明一个Color类型属性        _Color(&quot;Color Tint&quot;,Color)=(1.0,1.0,1.0,1.0)    &#125;    SubShader&#123;        Pass&#123;            CGPROGRAM            //告诉unity定义了vert和frag：顶点和片元着色器            #pragma vertex vert            #pragma fragment frag            //在Cg代码中需要定义一个与属性名称和类型都匹配的变量            fixed4 _Color;            //定义一个结构体来定义顶点着色器的输出            struct a2v&#123;                //存放顶点位置                float4 vertex:POSITION;                //存放法线                float3 normal:NORMAL;                //用第0个纹理填充texcoord                float4 texcoord:TEXCOORD0;            &#125;;            //使用一个结构体定义顶点着色器的输出            struct v2f&#123;                //把裁剪空间下的顶点坐标存放在pos                float4 pos:SV_POSITION;                //color用来存放颜色信息                fixed3 color:COLOR0;            &#125;;            //输入v:POSITION输入顶点位置，返回一个float4的变量            //SV_POSITION：表示输出的是裁剪空间的坐标,返回一个v2f的结构体            v2f vert(a2v v) &#123;            //定义需要传出的变量            v2f o;            o.pos=UnityObjectToClipPos(v.vertex);            o.color=v.normal*0.5+fixed3(0.5,0.5,0.5);            return o;        &#125;            //返回一个fixed4变量，SV_Target把输出的颜色输出到渲染目标中            fixed4 frag(v2f i) : SV_Target&#123;                fixed3 c=i.color;                c*=_Color.rgb;                return fixed4(c,1.0);            &#125;        ENDCG    &#125;    &#125;&#125;</code></pre><ul><li><p>属性表</p><p>| ShaderLab属性类型 |     Cg变量类型      |<br>| :———————-: | :————————-: |<br>|   Color,Vector    | float4,half4,fixed4 |<br>|    Range,Float    |  float,half,fixed   |<br>|        2D         |      sampler2D      |<br>|       Cube        |     samplerCube     |<br>|        3D         |      sampler3D      |</p></li><li><p>Cg变量前可能有uniform，可以省略</p></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> unity shader 入门精要总结 </category>
+          
+          <category> 第五章 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ShaderLab </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>语义</title>
+      <link href="/posts/92ba7da.html"/>
+      <url>/posts/92ba7da.html</url>
+      
+        <content type="html"><![CDATA[<h1 id="什么是语义"><a href="#什么是语义" class="headerlink" title="什么是语义"></a>什么是语义</h1><ul><li>语义是赋给shader输入和输出的字符串，即语义可以让shader知道从哪读取数据，并把数据输入到哪。</li><li>语义出现的位置 不同，含义也不同。</li></ul><h1 id="系统数值语义"><a href="#系统数值语义" class="headerlink" title="系统数值语义"></a>系统数值语义</h1><ul><li>以SV开头</li><li>不可以被随便赋值：需要完成特定的目的</li></ul><h1 id="Unity支持的语义"><a href="#Unity支持的语义" class="headerlink" title="Unity支持的语义"></a>Unity支持的语义</h1><h2 id="a2v"><a href="#a2v" class="headerlink" title="a2v"></a>a2v</h2><div class="table-container"><table><thead><tr><th style="text-align:center">语义</th><th style="text-align:center">描述</th></tr></thead><tbody><tr><td style="text-align:center">POSITION</td><td style="text-align:center">模型空间的顶点位置，通常是float4类型</td></tr><tr><td style="text-align:center">NORMAL</td><td style="text-align:center">顶点法线，float3</td></tr><tr><td style="text-align:center">TANGENT</td><td style="text-align:center">顶点切线，float4</td></tr><tr><td style="text-align:center">TEXCOORDn</td><td style="text-align:center">该顶点的纹理坐标，通常是float2或者float4</td></tr><tr><td style="text-align:center">COLOR</td><td style="text-align:center">顶点颜色，fixed4或者float4</td></tr></tbody></table></div><h2 id="v2f"><a href="#v2f" class="headerlink" title="v2f"></a>v2f</h2><div class="table-container"><table><thead><tr><th style="text-align:center">语义</th><th style="text-align:center">描述</th></tr></thead><tbody><tr><td style="text-align:center">SV_POSITION</td><td style="text-align:center">裁剪空间的顶点坐标，必须被包含</td></tr><tr><td style="text-align:center">COLOR0</td><td style="text-align:center">输出第一组顶点颜色（不是必须）</td></tr><tr><td style="text-align:center">COLOR1</td><td style="text-align:center">输出第二组顶点颜色（不是必须）</td></tr><tr><td style="text-align:center">TEXCOOORD0-7</td><td style="text-align:center">输出纹理坐标，不是必须</td></tr></tbody></table></div><h2 id="OUT"><a href="#OUT" class="headerlink" title="OUT"></a>OUT</h2><div class="table-container"><table><thead><tr><th style="text-align:center">语义</th><th style="text-align:center">描述</th></tr></thead><tbody><tr><td style="text-align:center">SV_Target</td><td style="text-align:center">会将输出值存储到渲染目标中。</td></tr></tbody></table></div>]]></content>
+      
+      
+      <categories>
+          
+          <category> unity shader 入门精要总结 </category>
+          
+          <category> 第五章 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ShaderLab </tag>
             
         </tags>
       
@@ -634,102 +634,11 @@
     
     
     <entry>
-      <title>渲染纹理</title>
-      <link href="/posts/3ae1c68d.html"/>
-      <url>/posts/3ae1c68d.html</url>
-      
-        <content type="html"><![CDATA[<h1 id="什么是渲染纹理"><a href="#什么是渲染纹理" class="headerlink" title="什么是渲染纹理"></a>什么是渲染纹理</h1><p>GPU允许我们把整个三维场景渲染到一个中间缓冲中，即<strong>渲染目标纹理</strong>，<strong>多重渲染目标</strong>可以把场景渲染到多个渲染目标纹理当中，而不需要为每个目标单独渲染一次整个场景。</p><p>unity为渲染目标纹理定义了一种专门的纹理类型：<strong>渲染纹理</strong></p><p>使用方法：</p><ul><li><p>在project目录下创建渲染纹理，把某个摄像机的渲染纹理目标设置为该渲染纹理。</p><p>该相机的渲染结果会实时更新到渲染纹理当中</p></li><li><p>使用屏幕后处理的方式使用GrabPass和OnRenderImage函数来获得当前屏幕图像。然后就可以进行图像处理。</p></li></ul><h1 id="实现镜子效果"><a href="#实现镜子效果" class="headerlink" title="实现镜子效果"></a>实现镜子效果</h1><p><img src="https://gitee.com/yurain11/drawing-bed/raw/master/img/202304131533969.png" alt="image-20230413153319588"></p><ul><li><p>将希望镜子呈现的图像通过摄像机显示，即在背面设置一个相机，将渲染纹理通过面片显示出来。</p></li><li><p>将渲染纹理赋给shader的texture即可</p></li></ul><pre><code class="lang-c#">//代码如下// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 10/Mirror&quot; &#123;    Properties &#123;        _MainTex (&quot;Main Tex&quot;, 2D) = &quot;white&quot; &#123;&#125;    &#125;    SubShader &#123;        Tags &#123; &quot;RenderType&quot;=&quot;Opaque&quot; &quot;Queue&quot;=&quot;Geometry&quot;&#125;        Pass &#123;            CGPROGRAM            #pragma vertex vert            #pragma fragment frag            sampler2D _MainTex;            struct a2v &#123;                float4 vertex : POSITION;                float3 texcoord : TEXCOORD0;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float2 uv : TEXCOORD0;            &#125;;            v2f vert(a2v v) &#123;                v2f o;                o.pos = UnityObjectToClipPos(v.vertex);                o.uv = v.texcoord;                // Mirror needs to filp x,翻转纹理，用于模拟镜子                o.uv.x = 1 - o.uv.x;                return o;            &#125;            fixed4 frag(v2f i) : SV_Target &#123;                return tex2D(_MainTex, i.uv);            &#125;            ENDCG        &#125;    &#125;      FallBack Off&#125;</code></pre><h1 id="玻璃效果"><a href="#玻璃效果" class="headerlink" title="玻璃效果"></a>玻璃效果</h1><p><img src="https://gitee.com/yurain11/drawing-bed/raw/master/img/202304131631099.png" alt="image-20230413163135832"></p><p>与简单的透明混合不同，使用GrabPass可以对物体后面的图像进行更加复杂的处理，比如使用法线来模拟折射效果。</p><ul><li>GrabPass：unity会把当前屏幕的图像绘制在一张纹理当中。</li><li>通常会使用GrabPass实现例如玻璃等透明材质的模拟</li></ul><h2 id="实现玻璃效果"><a href="#实现玻璃效果" class="headerlink" title="实现玻璃效果"></a>实现玻璃效果</h2><ol><li>使用法线纹理来修改模型的法线</li><li>通过Cubemap模拟玻璃反射</li><li>折射效果通过GrabPass抓取后面的图像进行后处理，使用切线空间的法线对屏幕纹理坐标进行偏移，再采样来模拟折射。</li><li>最终结果中反射通过物体显示，而折射则需要在摄像机中才能实现。</li></ol><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;_Object2World&#39; with &#39;unity_ObjectToWorld&#39;// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 10/Glass Refraction&quot; &#123;    Properties &#123;        _MainTex (&quot;Main Tex&quot;, 2D) = &quot;white&quot; &#123;&#125;        _BumpMap (&quot;Normal Map&quot;, 2D) = &quot;bump&quot; &#123;&#125;        _Cubemap (&quot;Environment Cubemap&quot;, Cube) = &quot;_Skybox&quot; &#123;&#125;        _Distortion (&quot;Distortion&quot;, Range(0, 100)) = 10        _RefractAmount (&quot;Refract Amount&quot;, Range(0.0, 1.0)) = 1.0    &#125;    SubShader &#123;        // We must be transparent, so other objects are drawn before this one.        Tags &#123; &quot;Queue&quot;=&quot;Transparent&quot; &quot;RenderType&quot;=&quot;Opaque&quot; &#125;        // This pass grabs the screen behind the object into a texture.        // We can access the result in the next pass as _RefractionTex        //定义了抓取的图像会被存在哪        GrabPass &#123; &quot;_RefractionTex&quot; &#125;        Pass &#123;                    CGPROGRAM            #pragma vertex vert            #pragma fragment frag            #include &quot;UnityCG.cginc&quot;            sampler2D _MainTex;            float4 _MainTex_ST;            sampler2D _BumpMap;            float4 _BumpMap_ST;            samplerCUBE _Cubemap;            float _Distortion;            fixed _RefractAmount;            sampler2D _RefractionTex;            float4 _RefractionTex_TexelSize;            struct a2v &#123;                float4 vertex : POSITION;                float3 normal : NORMAL;                float4 tangent : TANGENT;                 float2 texcoord: TEXCOORD0;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float4 scrPos : TEXCOORD0;                float4 uv : TEXCOORD1;                float4 TtoW0 : TEXCOORD2;                  float4 TtoW1 : TEXCOORD3;                  float4 TtoW2 : TEXCOORD4;             &#125;;            v2f vert (a2v v) &#123;                v2f o;                o.pos = UnityObjectToClipPos(v.vertex);                //调用内置函数得到被抓取的屏幕图像的采样坐标                o.scrPos = ComputeGrabScreenPos(o.pos);                o.uv.xy = TRANSFORM_TEX(v.texcoord, _MainTex);                o.uv.zw = TRANSFORM_TEX(v.texcoord, _BumpMap);                float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;                  fixed3 worldNormal = UnityObjectToWorldNormal(v.normal);                  fixed3 worldTangent = UnityObjectToWorldDir(v.tangent.xyz);                  fixed3 worldBinormal = cross(worldNormal, worldTangent) * v.tangent.w;                 o.TtoW0 = float4(worldTangent.x, worldBinormal.x, worldNormal.x, worldPos.x);                  o.TtoW1 = float4(worldTangent.y, worldBinormal.y, worldNormal.y, worldPos.y);                  o.TtoW2 = float4(worldTangent.z, worldBinormal.z, worldNormal.z, worldPos.z);                  return o;            &#125;            fixed4 frag (v2f i) : SV_Target &#123;                        float3 worldPos = float3(i.TtoW0.w, i.TtoW1.w, i.TtoW2.w);                fixed3 worldViewDir = normalize(UnityWorldSpaceViewDir(worldPos));                // Get the normal in tangent space                fixed3 bump = UnpackNormal(tex2D(_BumpMap, i.uv.zw));                    // Compute the offset in tangent space                //乘以纹素大小，就是针对每块纹素的法线进行偏移，即可求出偏移量（归一化后的情况）                float2 offset = bump.xy * _Distortion * _RefractionTex_TexelSize.xy;                //将偏移量拓展到屏幕空间，计算出被偏移点的实际屏幕空间坐标                i.scrPos.xy = offset * i.scrPos.z + i.scrPos.xy;                //用被偏移后的坐标去采样原来看到的图像，就可以得到偏移图像                fixed3 refrCol = tex2D(_RefractionTex, i.scrPos.xy/i.scrPos.w).rgb;                // Convert the normal to world space                bump = normalize(half3(dot(i.TtoW0.xyz, bump), dot(i.TtoW1.xyz, bump), dot(i.TtoW2.xyz, bump)));                fixed3 reflDir = reflect(-worldViewDir, bump);                fixed4 texColor = tex2D(_MainTex, i.uv.xy);                fixed3 reflCol = texCUBE(_Cubemap, reflDir).rgb * texColor.rgb;                fixed3 finalColor = reflCol * (1 - _RefractAmount) + refrCol * _RefractAmount;                return fixed4(finalColor, 1);            &#125;            ENDCG        &#125;    &#125;    FallBack &quot;Diffuse&quot;&#125;</code></pre><h1 id="渲染纹理vsGrabPass"><a href="#渲染纹理vsGrabPass" class="headerlink" title="渲染纹理vsGrabPass"></a>渲染纹理vsGrabPass</h1><p>GrabPass实现更加简单，</p><p>渲染纹理的效率更好：因为可以控制渲染的场景大小，而grabPass获取的是和显示屏一致的。</p><p>GrabPass需要CPU直接读取后备缓冲的数据，破坏和GPU的并行性。</p><p>Unity5引入命令缓冲command Buffer，可以得到类似抓屏效果。</p><h1 id="commad-buffers"><a href="#commad-buffers" class="headerlink" title="commad buffers"></a>commad buffers</h1>]]></content>
-      
-      
-      <categories>
-          
-          <category> unity shader 入门精要总结 </category>
-          
-          <category> 第十章：程序纹理 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> ShaderLab </tag>
-            
-            <tag> unity </tag>
-            
-            <tag> 纹理 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>程序纹理</title>
-      <link href="/posts/b3314196.html"/>
-      <url>/posts/b3314196.html</url>
-      
-        <content type="html"><![CDATA[<h1 id="什么是程序纹理"><a href="#什么是程序纹理" class="headerlink" title="什么是程序纹理"></a>什么是程序纹理</h1><p>通过算法创建个性图案或者非常真实的自然元素</p><h1 id="实现程序材质"><a href="#实现程序材质" class="headerlink" title="实现程序材质"></a>实现程序材质</h1><p>通过脚本创建程序纹理</p><p>通过Substance Designer创建程序纹理和材质</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> unity shader 入门精要总结 </category>
-          
-          <category> 第十章：程序纹理 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> ShaderLab </tag>
-            
-            <tag> 纹理 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>立方体纹理</title>
-      <link href="/posts/fe7c9daf.html"/>
-      <url>/posts/fe7c9daf.html</url>
-      
-        <content type="html"><![CDATA[<h1 id="什么是立方体纹理"><a href="#什么是立方体纹理" class="headerlink" title="什么是立方体纹理"></a>什么是立方体纹理</h1><ul><li><p>立方体纹理是环境映射的一种实现方式。</p></li><li><p>一共包含6张图像</p></li><li><p>好处：实现简单快速，效果好。</p><p>缺点：场景中引入新的物体，光源，或者物体发生移动时需要重新生成。</p><p>不能模拟多次反射的结果</p></li><li><p>尽量对凸面体使用立方体纹理。</p></li></ul><h2 id="天空盒子"><a href="#天空盒子" class="headerlink" title="天空盒子"></a>天空盒子</h2><p>用于模拟背景的一种方式。</p><p>添加天空盒子：</p><ol><li>新建材质，shader选择自带的Skybox/6 sided.</li><li>将图片附上，图片的wrap mode设置为clamp,</li><li>在window-rendering-lighting中的scene中将skybox设置为之前的材质</li><li>该设置会覆盖所有摄像机，如果希望使用不同的，需要给摄像机添加skybox组件。</li></ol><h2 id="创建环境映射的立方体纹理"><a href="#创建环境映射的立方体纹理" class="headerlink" title="创建环境映射的立方体纹理"></a>创建环境映射的立方体纹理</h2><ul><li><p>特殊布局的纹理创建</p><p>需要类似立方体展开图或者全景布局图，将texture type设置为cubemap</p></li><li><p>手动创建Cubemap</p><p>上面的方法</p></li><li><p>脚本生成</p><p>通过unity提供的Camera.RenderToCubemap函数实现，该函数可以把任意位置的场景图像储存到6张图像中。</p><pre><code class="lang-c#">using UnityEngine;using UnityEditor;using System.Collections;public class RenderCubemapWizard : ScriptableWizard &#123;    public Transform renderFromPosition;    public Cubemap cubemap;    void OnWizardUpdate () &#123;        helpString = &quot;Select transform to render from and cubemap to render into&quot;;        isValid = (renderFromPosition != null) &amp;&amp; (cubemap != null);    &#125;    void OnWizardCreate () &#123;        // create temporary camera for rendering        GameObject go = new GameObject( &quot;CubemapCamera&quot;);        go.AddComponent&lt;Camera&gt;();        // place it on the object        go.transform.position = renderFromPosition.position;        // render into cubemap                go.GetComponent&lt;Camera&gt;().RenderToCubemap(cubemap);        // destroy temporary camera        DestroyImmediate( go );    &#125;    [MenuItem(&quot;GameObject/Render into Cubemap&quot;)]    static void RenderCubemap () &#123;        ScriptableWizard.DisplayWizard&lt;RenderCubemapWizard&gt;(            &quot;Render cubemap&quot;, &quot;Render!&quot;);    &#125;&#125;</code></pre><p>通过调用该脚本就可以把一个位置的环境渲染到一个Cubemap当中。</p></li></ul><h2 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h2><ul><li>通过视角方向的反射方向即可知道采样的位置。</li></ul><pre><code class="lang-C#">// Upgrade NOTE: replaced &#39;_Object2World&#39; with &#39;unity_ObjectToWorld&#39;// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 10/Reflection&quot; &#123;    Properties &#123;        _Color (&quot;Color Tint&quot;, Color) = (1, 1, 1, 1)        //控制反射颜色        _ReflectColor (&quot;Reflection Color&quot;, Color) = (1, 1, 1, 1)        //控制反射程度        _ReflectAmount (&quot;Reflect Amount&quot;, Range(0, 1)) = 1        //导入Cubemap        _Cubemap (&quot;Reflection Cubemap&quot;, Cube) = &quot;_Skybox&quot; &#123;&#125;    &#125;    SubShader &#123;        Tags &#123; &quot;RenderType&quot;=&quot;Opaque&quot; &quot;Queue&quot;=&quot;Geometry&quot;&#125;        Pass &#123;             Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            CGPROGRAM            #pragma multi_compile_fwdbase            #pragma vertex vert            #pragma fragment frag            #include &quot;Lighting.cginc&quot;            #include &quot;AutoLight.cginc&quot;            fixed4 _Color;            fixed4 _ReflectColor;            fixed _ReflectAmount;            samplerCUBE _Cubemap;            struct a2v &#123;                float4 vertex : POSITION;                float3 normal : NORMAL;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float3 worldPos : TEXCOORD0;                fixed3 worldNormal : TEXCOORD1;                fixed3 worldViewDir : TEXCOORD2;                fixed3 worldRefl : TEXCOORD3;                SHADOW_COORDS(4)            &#125;;            v2f vert(a2v v) &#123;                v2f o;                o.pos = UnityObjectToClipPos(v.vertex);                o.worldNormal = UnityObjectToWorldNormal(v.normal);                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;                o.worldViewDir = UnityWorldSpaceViewDir(o.worldPos);                // Compute the reflect dir in world space                //通过视角方向计算反射方向，即得到指向环境的方向，通过这个方向在Cubemap中采样                o.worldRefl = reflect(-o.worldViewDir, o.worldNormal);                TRANSFER_SHADOW(o);                return o;            &#125;            fixed4 frag(v2f i) : SV_Target &#123;                fixed3 worldNormal = normalize(i.worldNormal);                fixed3 worldLightDir = normalize(UnityWorldSpaceLightDir(i.worldPos));                        fixed3 worldViewDir = normalize(i.worldViewDir);                        fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;                fixed3 diffuse = _LightColor0.rgb * _Color.rgb * max(0, dot(worldNormal, worldLightDir));                // Use the reflect dir in world space to access the cubemap                fixed3 reflection = texCUBE(_Cubemap, i.worldRefl).rgb * _ReflectColor.rgb;                UNITY_LIGHT_ATTENUATION(atten, i, i.worldPos);                // Mix the diffuse color with the reflected color                //通过反射系数混合漫反射和反射，最后乘上光强衰减系数                fixed3 color = ambient + lerp(diffuse, reflection, _ReflectAmount) * atten;                return fixed4(color, 1.0);            &#125;            ENDCG        &#125;    &#125;    FallBack &quot;Reflective/VertexLit&quot;&#125;</code></pre><h2 id="折射"><a href="#折射" class="headerlink" title="折射"></a>折射</h2><ul><li><p>斯涅尔定律（Snell’s Law）</p><script type="math/tex; mode=display">\eta_1sin\theta_1=\eta_2sin\theta_2</script><p>一般来说需要计算两次折射：射入和射出</p><p>但是实时渲染一般模拟1次折射</p></li></ul><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;_Object2World&#39; with &#39;unity_ObjectToWorld&#39;// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 10/Refraction&quot; &#123;    Properties &#123;        _Color (&quot;Color Tint&quot;, Color) = (1, 1, 1, 1)        _RefractColor (&quot;Refraction Color&quot;, Color) = (1, 1, 1, 1)        //折射比率        _RefractAmount (&quot;Refraction Amount&quot;, Range(0, 1)) = 1        //不同介质的透射比        _RefractRatio (&quot;Refraction Ratio&quot;, Range(0.1, 1)) = 0.5        _Cubemap (&quot;Refraction Cubemap&quot;, Cube) = &quot;_Skybox&quot; &#123;&#125;    &#125;    SubShader &#123;        Tags &#123; &quot;RenderType&quot;=&quot;Opaque&quot; &quot;Queue&quot;=&quot;Geometry&quot;&#125;        Pass &#123;             Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            CGPROGRAM            #pragma multi_compile_fwdbase                #pragma vertex vert            #pragma fragment frag            #include &quot;Lighting.cginc&quot;            #include &quot;AutoLight.cginc&quot;            fixed4 _Color;            fixed4 _RefractColor;            float _RefractAmount;            fixed _RefractRatio;            samplerCUBE _Cubemap;            struct a2v &#123;                float4 vertex : POSITION;                float3 normal : NORMAL;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float3 worldPos : TEXCOORD0;                fixed3 worldNormal : TEXCOORD1;                fixed3 worldViewDir : TEXCOORD2;                fixed3 worldRefr : TEXCOORD3;                SHADOW_COORDS(4)            &#125;;            v2f vert(a2v v) &#123;                v2f o;                o.pos = UnityObjectToClipPos(v.vertex);                o.worldNormal = UnityObjectToWorldNormal(v.normal);                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;                o.worldViewDir = UnityWorldSpaceViewDir(o.worldPos);                // Compute the refract dir in world space                //需要入射方向，和法线，第三个两个介质的折射率之比，a-&gt;b，re=a/b                o.worldRefr = refract(-normalize(o.worldViewDir), normalize(o.worldNormal), _RefractRatio);                TRANSFER_SHADOW(o);                return o;            &#125;            fixed4 frag(v2f i) : SV_Target &#123;                fixed3 worldNormal = normalize(i.worldNormal);                fixed3 worldLightDir = normalize(UnityWorldSpaceLightDir(i.worldPos));                fixed3 worldViewDir = normalize(i.worldViewDir);                fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;                fixed3 diffuse = _LightColor0.rgb * _Color.rgb * max(0, dot(worldNormal, worldLightDir));                // Use the refract dir in world space to access the cubemap                fixed3 refraction = texCUBE(_Cubemap, i.worldRefr).rgb * _RefractColor.rgb;                UNITY_LIGHT_ATTENUATION(atten, i, i.worldPos);                // Mix the diffuse color with the refract color                fixed3 color = ambient + lerp(diffuse, refraction, _RefractAmount) * atten;                return fixed4(color, 1.0);            &#125;            ENDCG        &#125;    &#125;     FallBack &quot;Reflective/VertexLit&quot;&#125;</code></pre><h2 id="菲涅尔反射"><a href="#菲涅尔反射" class="headerlink" title="菲涅尔反射"></a>菲涅尔反射</h2><p>原理：当光线照射到物体表面时，一部分反射，一部分发生折射和散射，被反射的光和入射光存在一定的比率关系。</p><p>菲涅尔等式：</p><p>近似公式：Schlick 菲涅尔近似等式：</p><script type="math/tex; mode=display">F_{Schlick}(v,n)=F_0+(1-F_0)(1-v·n)^5</script><p>F~0~是反射系数，控制反射强度，v是视角方向，n是法线</p><p>应用广泛的等式是Empricial菲涅尔近似等式：</p><script type="math/tex; mode=display">F_{Empricial}(v,n)=max(0,min(1,bias+scale\times(1-v·n)^{power}))</script><p>三个英文是控制项</p><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;_Object2World&#39; with &#39;unity_ObjectToWorld&#39;// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;//schlickjShader &quot;Unity Shaders Book/Chapter 10/Fresnel&quot; &#123;    Properties &#123;        _Color (&quot;Color Tint&quot;, Color) = (1, 1, 1, 1)        _FresnelScale (&quot;Fresnel Scale&quot;, Range(0, 1)) = 0.5        _Cubemap (&quot;Reflection Cubemap&quot;, Cube) = &quot;_Skybox&quot; &#123;&#125;    &#125;    SubShader &#123;        Tags &#123; &quot;RenderType&quot;=&quot;Opaque&quot; &quot;Queue&quot;=&quot;Geometry&quot;&#125;        Pass &#123;             Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            CGPROGRAM            #pragma multi_compile_fwdbase            #pragma vertex vert            #pragma fragment frag            #include &quot;Lighting.cginc&quot;            #include &quot;AutoLight.cginc&quot;            fixed4 _Color;            fixed _FresnelScale;            samplerCUBE _Cubemap;            struct a2v &#123;                float4 vertex : POSITION;                float3 normal : NORMAL;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float3 worldPos : TEXCOORD0;                  fixed3 worldNormal : TEXCOORD1;                  fixed3 worldViewDir : TEXCOORD2;                  fixed3 worldRefl : TEXCOORD3;                  SHADOW_COORDS(4)            &#125;;            v2f vert(a2v v) &#123;                v2f o;                o.pos = UnityObjectToClipPos(v.vertex);                o.worldNormal = UnityObjectToWorldNormal(v.normal);                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;                o.worldViewDir = UnityWorldSpaceViewDir(o.worldPos);                o.worldRefl = reflect(-o.worldViewDir, o.worldNormal);                TRANSFER_SHADOW(o);                return o;            &#125;            fixed4 frag(v2f i) : SV_Target &#123;                fixed3 worldNormal = normalize(i.worldNormal);                fixed3 worldLightDir = normalize(UnityWorldSpaceLightDir(i.worldPos));                fixed3 worldViewDir = normalize(i.worldViewDir);                fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;                UNITY_LIGHT_ATTENUATION(atten, i, i.worldPos);                fixed3 reflection = texCUBE(_Cubemap, i.worldRefl).rgb;                fixed fresnel = _FresnelScale + (1 - _FresnelScale) * pow(1 - dot(worldViewDir, worldNormal), 5);                fixed3 diffuse = _LightColor0.rgb * _Color.rgb * max(0, dot(worldNormal, worldLightDir));                //通过菲涅尔系数控制漫反射和反射的混合程度                fixed3 color = ambient + lerp(diffuse, reflection, saturate(fresnel)) * atten;                return fixed4(color, 1.0);            &#125;            ENDCG        &#125;    &#125;     FallBack &quot;Reflective/VertexLit&quot;&#125;</code></pre>]]></content>
-      
-      
-      <categories>
-          
-          <category> unity shader 入门精要总结 </category>
-          
-          <category> 第十章：程序纹理 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> ShaderLab </tag>
-            
-            <tag> unity </tag>
-            
-            <tag> 纹理 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>顶点动画</title>
       <link href="/posts/3765f5c1.html"/>
       <url>/posts/3765f5c1.html</url>
       
-        <content type="html"><![CDATA[<h1 id="使用内置时间变量"><a href="#使用内置时间变量" class="headerlink" title="使用内置时间变量"></a>使用内置时间变量</h1><div class="table-container"><table><thead><tr><th style="text-align:center">名称</th><th style="text-align:center">类型</th><th style="text-align:center">描述</th></tr></thead><tbody><tr><td style="text-align:center">_Time</td><td style="text-align:center">float4</td><td style="text-align:center">自场景加载的时间（t/20,t,2t,3t）</td></tr><tr><td style="text-align:center">_SinTime</td><td style="text-align:center">float4</td><td style="text-align:center">t是时间的正弦值，（t/8,t/4,t/2,t）</td></tr><tr><td style="text-align:center">_CosTime</td><td style="text-align:center">float4</td><td style="text-align:center">t是时间的余弦值，（t/8,t/4,t/2,t）</td></tr><tr><td style="text-align:center">unity_DeltaTime</td><td style="text-align:center">float4</td><td style="text-align:center">dt是时间增量（dt,1/dt,smoothDt,1/smoothDt）</td></tr></tbody></table></div><h1 id="纹理动画"><a href="#纹理动画" class="headerlink" title="纹理动画"></a>纹理动画</h1><h2 id="帧序列动画"><a href="#帧序列动画" class="headerlink" title="帧序列动画"></a>帧序列动画</h2><p>主要思路：</p><ol><li>动画的每一帧都放在一张图中，需要对纹理图的采样区域不停变化。</li><li>需要通过时间变量进行变化</li><li>需要把采样的区域量化</li></ol><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 11/Image Sequence Animation&quot; &#123;    Properties &#123;        _Color (&quot;Color Tint&quot;, Color) = (1, 1, 1, 1)        _MainTex (&quot;Image Sequence&quot;, 2D) = &quot;white&quot; &#123;&#125;        _HorizontalAmount (&quot;Horizontal Amount&quot;, Float) = 4        _VerticalAmount (&quot;Vertical Amount&quot;, Float) = 4        _Speed (&quot;Speed&quot;, Range(1, 100)) = 30    &#125;    SubShader &#123;        Tags &#123;&quot;Queue&quot;=&quot;Transparent&quot; &quot;IgnoreProjector&quot;=&quot;True&quot; &quot;RenderType&quot;=&quot;Transparent&quot;&#125;        Pass &#123;            Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            ZWrite Off            Blend SrcAlpha OneMinusSrcAlpha            CGPROGRAM            #pragma vertex vert              #pragma fragment frag            #include &quot;UnityCG.cginc&quot;            fixed4 _Color;            sampler2D _MainTex;            float4 _MainTex_ST;            float _HorizontalAmount;            float _VerticalAmount;            float _Speed;            struct a2v &#123;                  float4 vertex : POSITION;                 float2 texcoord : TEXCOORD0;            &#125;;              struct v2f &#123;                  float4 pos : SV_POSITION;                float2 uv : TEXCOORD0;            &#125;;              v2f vert (a2v v) &#123;                  v2f o;                  o.pos = UnityObjectToClipPos(v.vertex);                  o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);                  return o;            &#125;              fixed4 frag (v2f i) : SV_Target &#123;                //floor函数用来取整                float time = floor(_Time.y * _Speed);                  float row = floor(time / _HorizontalAmount);                float column = time - row * _HorizontalAmount;//                half2 uv = float2(i.uv.x /_HorizontalAmount, i.uv.y / _VerticalAmount);//                uv.x += column / _HorizontalAmount;//                uv.y -= row / _VerticalAmount;                half2 uv = i.uv + half2(column, -row);                uv.x /=  _HorizontalAmount;                uv.y /= _VerticalAmount;                fixed4 c = tex2D(_MainTex, uv);                c.rgb *= _Color;                return c;            &#125;            ENDCG        &#125;      &#125;    FallBack &quot;Transparent/VertexLit&quot;&#125;</code></pre><h2 id="滚动的背景"><a href="#滚动的背景" class="headerlink" title="滚动的背景"></a>滚动的背景</h2><p>思路：对uv采样位置进行偏移，也是通过内置时间函数</p><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 11/Scrolling Background&quot; &#123;    Properties &#123;        _MainTex (&quot;Base Layer (RGB)&quot;, 2D) = &quot;white&quot; &#123;&#125;        _DetailTex (&quot;2nd Layer (RGB)&quot;, 2D) = &quot;white&quot; &#123;&#125;        _ScrollX (&quot;Base layer Scroll Speed&quot;, Float) = 1.0        _Scroll2X (&quot;2nd layer Scroll Speed&quot;, Float) = 1.0        _Multiplier (&quot;Layer Multiplier&quot;, Float) = 1    &#125;    SubShader &#123;        Tags &#123; &quot;RenderType&quot;=&quot;Opaque&quot; &quot;Queue&quot;=&quot;Geometry&quot;&#125;        Pass &#123;             Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            CGPROGRAM            #pragma vertex vert            #pragma fragment frag            #include &quot;UnityCG.cginc&quot;            sampler2D _MainTex;            sampler2D _DetailTex;            float4 _MainTex_ST;            float4 _DetailTex_ST;            float _ScrollX;            float _Scroll2X;            float _Multiplier;            struct a2v &#123;                float4 vertex : POSITION;                float4 texcoord : TEXCOORD0;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float4 uv : TEXCOORD0;            &#125;;            v2f vert (a2v v) &#123;                v2f o;                o.pos = UnityObjectToClipPos(v.vertex);                o.uv.xy = TRANSFORM_TEX(v.texcoord, _MainTex) + frac(float2(_ScrollX, 0.0) * _Time.y);                o.uv.zw = TRANSFORM_TEX(v.texcoord, _DetailTex) + frac(float2(_Scroll2X, 0.0) * _Time.y);                return o;            &#125;            fixed4 frag (v2f i) : SV_Target &#123;                fixed4 firstLayer = tex2D(_MainTex, i.uv.xy);                fixed4 secondLayer = tex2D(_DetailTex, i.uv.zw);                fixed4 c = lerp(firstLayer, secondLayer, secondLayer.a);                c.rgb *= _Multiplier;                return c;            &#125;            ENDCG        &#125;    &#125;    FallBack &quot;VertexLit&quot;&#125;</code></pre>]]></content>
+        <content type="html"><![CDATA[<h1 id="流动的河流"><a href="#流动的河流" class="headerlink" title="流动的河流"></a>流动的河流</h1><p>思路:使用顶点动画</p><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 11/Water&quot; &#123;    Properties &#123;        _MainTex (&quot;Main Tex&quot;, 2D) = &quot;white&quot; &#123;&#125;        _Color (&quot;Color Tint&quot;, Color) = (1, 1, 1, 1)        _Magnitude (&quot;Distortion Magnitude&quot;, Float) = 1         _Frequency (&quot;Distortion Frequency&quot;, Float) = 1         _InvWaveLength (&quot;Distortion Inverse Wave Length&quot;, Float) = 10         _Speed (&quot;Speed&quot;, Float) = 0.5    &#125;    SubShader &#123;        //批处理会合并所有相关模型，模型会丢失自己的模型空间，所以在顶点动画        // Need to disable batching because of the vertex animation        Tags &#123;&quot;Queue&quot;=&quot;Transparent&quot; &quot;IgnoreProjector&quot;=&quot;True&quot; &quot;RenderType&quot;=&quot;Transparent&quot; &quot;DisableBatching&quot;=&quot;True&quot;&#125;        Pass &#123;            Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            ZWrite Off            Blend SrcAlpha OneMinusSrcAlpha            Cull Off            CGPROGRAM              #pragma vertex vert             #pragma fragment frag            #include &quot;UnityCG.cginc&quot;             sampler2D _MainTex;            float4 _MainTex_ST;            fixed4 _Color;            float _Magnitude;            float _Frequency;            float _InvWaveLength;            float _Speed;            struct a2v &#123;                float4 vertex : POSITION;                float4 texcoord : TEXCOORD0;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float2 uv : TEXCOORD0;            &#125;;            v2f vert(a2v v) &#123;                v2f o;                float4 offset;                offset.yzw = float3(0.0, 0.0, 0.0);                //_Frequency控制频率，_InvWaveLength控制波长，_Magnitude控制振幅                offset.x = sin(_Frequency * _Time.y + v.vertex.x * _InvWaveLength + v.vertex.y * _InvWaveLength + v.vertex.z * _InvWaveLength) * _Magnitude;                o.pos = UnityObjectToClipPos(v.vertex + offset);                o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);                o.uv +=  float2(0.0, _Time.y * _Speed);                return o;            &#125;            fixed4 frag(v2f i) : SV_Target &#123;                fixed4 c = tex2D(_MainTex, i.uv);                c.rgb *= _Color.rgb;                return c;            &#125;             ENDCG        &#125;    &#125;    FallBack &quot;Transparent/VertexLit&quot;&#125;</code></pre><h1 id="广告牌"><a href="#广告牌" class="headerlink" title="广告牌"></a>广告牌</h1><p>目标：物体始终正对视角，摄像机</p><p>原理：物体的方向需要三个轴确定：表面法线（在这里用视角方向），向上方向，向右方向。</p><p>已知表面法线不会变的情况下，首先利用表面法线和原向上方向确定向右方向，然后利用表面法线和向右方向确定新的向上方向。</p><script type="math/tex; mode=display">right=up*normal\\up'=normal*right</script><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;_World2Object&#39; with &#39;unity_WorldToObject&#39;// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 11/Billboard&quot; &#123;    Properties &#123;        _MainTex (&quot;Main Tex&quot;, 2D) = &quot;white&quot; &#123;&#125;        _Color (&quot;Color Tint&quot;, Color) = (1, 1, 1, 1)        _VerticalBillboarding (&quot;Vertical Restraints&quot;, Range(0, 1)) = 1     &#125;    SubShader &#123;        // Need to disable batching because of the vertex animation        Tags &#123;&quot;Queue&quot;=&quot;Transparent&quot; &quot;IgnoreProjector&quot;=&quot;True&quot; &quot;RenderType&quot;=&quot;Transparent&quot; &quot;DisableBatching&quot;=&quot;True&quot;&#125;        Pass &#123;             Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            ZWrite Off            Blend SrcAlpha OneMinusSrcAlpha            Cull Off            CGPROGRAM            #pragma vertex vert            #pragma fragment frag            #include &quot;Lighting.cginc&quot;            sampler2D _MainTex;            float4 _MainTex_ST;            fixed4 _Color;            fixed _VerticalBillboarding;            struct a2v &#123;                float4 vertex : POSITION;                float4 texcoord : TEXCOORD0;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float2 uv : TEXCOORD0;            &#125;;            v2f vert (a2v v) &#123;                v2f o;                // Suppose the center in object space is fixed                float3 center = float3(0, 0, 0);                float3 viewer = mul(unity_WorldToObject,float4(_WorldSpaceCameraPos, 1));                float3 normalDir = viewer - center;                // If _VerticalBillboarding equals 1, we use the desired view dir as the normal dir                // Which means the normal dir is fixed                // Or if _VerticalBillboarding equals 0, the y of normal is 0                // Which means the up dir is fixed                normalDir.y =normalDir.y * _VerticalBillboarding;                normalDir = normalize(normalDir);                // Get the approximate up dir                // If normal dir is already towards up, then the up dir is towards front                //如果向上方向和法线重合，就设置向上方向为（0，0，1）                float3 upDir = abs(normalDir.y) &gt; 0.999 ? float3(0, 0, 1) : float3(0, 1, 0);                float3 rightDir = normalize(cross(upDir, normalDir));                upDir = normalize(cross(normalDir, rightDir));                // Use the three vectors to rotate the quad                float3 centerOffs = v.vertex.xyz - center;                //对顶点进行偏移                float3 localPos = center + rightDir * centerOffs.x + upDir * centerOffs.y + normalDir * centerOffs.z;                o.pos = UnityObjectToClipPos(float4(localPos, 1));                o.uv = TRANSFORM_TEX(v.texcoord,_MainTex);                return o;            &#125;            fixed4 frag (v2f i) : SV_Target &#123;                fixed4 c = tex2D (_MainTex, i.uv);                c.rgb *= _Color.rgb;                return c;            &#125;            ENDCG        &#125;    &#125;     FallBack &quot;Transparent/VertexLit&quot;&#125;</code></pre><h1 id="顶点阴影"><a href="#顶点阴影" class="headerlink" title="顶点阴影"></a>顶点阴影</h1><p>原理：unity内置的阴影投射不涉及到顶点变换，所以如果我们需要阴影也有变形效果，需要自己写一个shadowCasterPass。</p>]]></content>
       
       
       <categories>
@@ -760,7 +669,7 @@
       <link href="/posts/3765f5c1.html"/>
       <url>/posts/3765f5c1.html</url>
       
-        <content type="html"><![CDATA[<h1 id="流动的河流"><a href="#流动的河流" class="headerlink" title="流动的河流"></a>流动的河流</h1><p>思路:使用顶点动画</p><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 11/Water&quot; &#123;    Properties &#123;        _MainTex (&quot;Main Tex&quot;, 2D) = &quot;white&quot; &#123;&#125;        _Color (&quot;Color Tint&quot;, Color) = (1, 1, 1, 1)        _Magnitude (&quot;Distortion Magnitude&quot;, Float) = 1         _Frequency (&quot;Distortion Frequency&quot;, Float) = 1         _InvWaveLength (&quot;Distortion Inverse Wave Length&quot;, Float) = 10         _Speed (&quot;Speed&quot;, Float) = 0.5    &#125;    SubShader &#123;        //批处理会合并所有相关模型，模型会丢失自己的模型空间，所以在顶点动画        // Need to disable batching because of the vertex animation        Tags &#123;&quot;Queue&quot;=&quot;Transparent&quot; &quot;IgnoreProjector&quot;=&quot;True&quot; &quot;RenderType&quot;=&quot;Transparent&quot; &quot;DisableBatching&quot;=&quot;True&quot;&#125;        Pass &#123;            Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            ZWrite Off            Blend SrcAlpha OneMinusSrcAlpha            Cull Off            CGPROGRAM              #pragma vertex vert             #pragma fragment frag            #include &quot;UnityCG.cginc&quot;             sampler2D _MainTex;            float4 _MainTex_ST;            fixed4 _Color;            float _Magnitude;            float _Frequency;            float _InvWaveLength;            float _Speed;            struct a2v &#123;                float4 vertex : POSITION;                float4 texcoord : TEXCOORD0;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float2 uv : TEXCOORD0;            &#125;;            v2f vert(a2v v) &#123;                v2f o;                float4 offset;                offset.yzw = float3(0.0, 0.0, 0.0);                //_Frequency控制频率，_InvWaveLength控制波长，_Magnitude控制振幅                offset.x = sin(_Frequency * _Time.y + v.vertex.x * _InvWaveLength + v.vertex.y * _InvWaveLength + v.vertex.z * _InvWaveLength) * _Magnitude;                o.pos = UnityObjectToClipPos(v.vertex + offset);                o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);                o.uv +=  float2(0.0, _Time.y * _Speed);                return o;            &#125;            fixed4 frag(v2f i) : SV_Target &#123;                fixed4 c = tex2D(_MainTex, i.uv);                c.rgb *= _Color.rgb;                return c;            &#125;             ENDCG        &#125;    &#125;    FallBack &quot;Transparent/VertexLit&quot;&#125;</code></pre><h1 id="广告牌"><a href="#广告牌" class="headerlink" title="广告牌"></a>广告牌</h1><p>目标：物体始终正对视角，摄像机</p><p>原理：物体的方向需要三个轴确定：表面法线（在这里用视角方向），向上方向，向右方向。</p><p>已知表面法线不会变的情况下，首先利用表面法线和原向上方向确定向右方向，然后利用表面法线和向右方向确定新的向上方向。</p><script type="math/tex; mode=display">right=up*normal\\up'=normal*right</script><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;_World2Object&#39; with &#39;unity_WorldToObject&#39;// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 11/Billboard&quot; &#123;    Properties &#123;        _MainTex (&quot;Main Tex&quot;, 2D) = &quot;white&quot; &#123;&#125;        _Color (&quot;Color Tint&quot;, Color) = (1, 1, 1, 1)        _VerticalBillboarding (&quot;Vertical Restraints&quot;, Range(0, 1)) = 1     &#125;    SubShader &#123;        // Need to disable batching because of the vertex animation        Tags &#123;&quot;Queue&quot;=&quot;Transparent&quot; &quot;IgnoreProjector&quot;=&quot;True&quot; &quot;RenderType&quot;=&quot;Transparent&quot; &quot;DisableBatching&quot;=&quot;True&quot;&#125;        Pass &#123;             Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            ZWrite Off            Blend SrcAlpha OneMinusSrcAlpha            Cull Off            CGPROGRAM            #pragma vertex vert            #pragma fragment frag            #include &quot;Lighting.cginc&quot;            sampler2D _MainTex;            float4 _MainTex_ST;            fixed4 _Color;            fixed _VerticalBillboarding;            struct a2v &#123;                float4 vertex : POSITION;                float4 texcoord : TEXCOORD0;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float2 uv : TEXCOORD0;            &#125;;            v2f vert (a2v v) &#123;                v2f o;                // Suppose the center in object space is fixed                float3 center = float3(0, 0, 0);                float3 viewer = mul(unity_WorldToObject,float4(_WorldSpaceCameraPos, 1));                float3 normalDir = viewer - center;                // If _VerticalBillboarding equals 1, we use the desired view dir as the normal dir                // Which means the normal dir is fixed                // Or if _VerticalBillboarding equals 0, the y of normal is 0                // Which means the up dir is fixed                normalDir.y =normalDir.y * _VerticalBillboarding;                normalDir = normalize(normalDir);                // Get the approximate up dir                // If normal dir is already towards up, then the up dir is towards front                //如果向上方向和法线重合，就设置向上方向为（0，0，1）                float3 upDir = abs(normalDir.y) &gt; 0.999 ? float3(0, 0, 1) : float3(0, 1, 0);                float3 rightDir = normalize(cross(upDir, normalDir));                upDir = normalize(cross(normalDir, rightDir));                // Use the three vectors to rotate the quad                float3 centerOffs = v.vertex.xyz - center;                //对顶点进行偏移                float3 localPos = center + rightDir * centerOffs.x + upDir * centerOffs.y + normalDir * centerOffs.z;                o.pos = UnityObjectToClipPos(float4(localPos, 1));                o.uv = TRANSFORM_TEX(v.texcoord,_MainTex);                return o;            &#125;            fixed4 frag (v2f i) : SV_Target &#123;                fixed4 c = tex2D (_MainTex, i.uv);                c.rgb *= _Color.rgb;                return c;            &#125;            ENDCG        &#125;    &#125;     FallBack &quot;Transparent/VertexLit&quot;&#125;</code></pre><h1 id="顶点阴影"><a href="#顶点阴影" class="headerlink" title="顶点阴影"></a>顶点阴影</h1><p>原理：unity内置的阴影投射不涉及到顶点变换，所以如果我们需要阴影也有变形效果，需要自己写一个shadowCasterPass。</p>]]></content>
+        <content type="html"><![CDATA[<h1 id="使用内置时间变量"><a href="#使用内置时间变量" class="headerlink" title="使用内置时间变量"></a>使用内置时间变量</h1><div class="table-container"><table><thead><tr><th style="text-align:center">名称</th><th style="text-align:center">类型</th><th style="text-align:center">描述</th></tr></thead><tbody><tr><td style="text-align:center">_Time</td><td style="text-align:center">float4</td><td style="text-align:center">自场景加载的时间（t/20,t,2t,3t）</td></tr><tr><td style="text-align:center">_SinTime</td><td style="text-align:center">float4</td><td style="text-align:center">t是时间的正弦值，（t/8,t/4,t/2,t）</td></tr><tr><td style="text-align:center">_CosTime</td><td style="text-align:center">float4</td><td style="text-align:center">t是时间的余弦值，（t/8,t/4,t/2,t）</td></tr><tr><td style="text-align:center">unity_DeltaTime</td><td style="text-align:center">float4</td><td style="text-align:center">dt是时间增量（dt,1/dt,smoothDt,1/smoothDt）</td></tr></tbody></table></div><h1 id="纹理动画"><a href="#纹理动画" class="headerlink" title="纹理动画"></a>纹理动画</h1><h2 id="帧序列动画"><a href="#帧序列动画" class="headerlink" title="帧序列动画"></a>帧序列动画</h2><p>主要思路：</p><ol><li>动画的每一帧都放在一张图中，需要对纹理图的采样区域不停变化。</li><li>需要通过时间变量进行变化</li><li>需要把采样的区域量化</li></ol><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 11/Image Sequence Animation&quot; &#123;    Properties &#123;        _Color (&quot;Color Tint&quot;, Color) = (1, 1, 1, 1)        _MainTex (&quot;Image Sequence&quot;, 2D) = &quot;white&quot; &#123;&#125;        _HorizontalAmount (&quot;Horizontal Amount&quot;, Float) = 4        _VerticalAmount (&quot;Vertical Amount&quot;, Float) = 4        _Speed (&quot;Speed&quot;, Range(1, 100)) = 30    &#125;    SubShader &#123;        Tags &#123;&quot;Queue&quot;=&quot;Transparent&quot; &quot;IgnoreProjector&quot;=&quot;True&quot; &quot;RenderType&quot;=&quot;Transparent&quot;&#125;        Pass &#123;            Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            ZWrite Off            Blend SrcAlpha OneMinusSrcAlpha            CGPROGRAM            #pragma vertex vert              #pragma fragment frag            #include &quot;UnityCG.cginc&quot;            fixed4 _Color;            sampler2D _MainTex;            float4 _MainTex_ST;            float _HorizontalAmount;            float _VerticalAmount;            float _Speed;            struct a2v &#123;                  float4 vertex : POSITION;                 float2 texcoord : TEXCOORD0;            &#125;;              struct v2f &#123;                  float4 pos : SV_POSITION;                float2 uv : TEXCOORD0;            &#125;;              v2f vert (a2v v) &#123;                  v2f o;                  o.pos = UnityObjectToClipPos(v.vertex);                  o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);                  return o;            &#125;              fixed4 frag (v2f i) : SV_Target &#123;                //floor函数用来取整                float time = floor(_Time.y * _Speed);                  float row = floor(time / _HorizontalAmount);                float column = time - row * _HorizontalAmount;//                half2 uv = float2(i.uv.x /_HorizontalAmount, i.uv.y / _VerticalAmount);//                uv.x += column / _HorizontalAmount;//                uv.y -= row / _VerticalAmount;                half2 uv = i.uv + half2(column, -row);                uv.x /=  _HorizontalAmount;                uv.y /= _VerticalAmount;                fixed4 c = tex2D(_MainTex, uv);                c.rgb *= _Color;                return c;            &#125;            ENDCG        &#125;      &#125;    FallBack &quot;Transparent/VertexLit&quot;&#125;</code></pre><h2 id="滚动的背景"><a href="#滚动的背景" class="headerlink" title="滚动的背景"></a>滚动的背景</h2><p>思路：对uv采样位置进行偏移，也是通过内置时间函数</p><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 11/Scrolling Background&quot; &#123;    Properties &#123;        _MainTex (&quot;Base Layer (RGB)&quot;, 2D) = &quot;white&quot; &#123;&#125;        _DetailTex (&quot;2nd Layer (RGB)&quot;, 2D) = &quot;white&quot; &#123;&#125;        _ScrollX (&quot;Base layer Scroll Speed&quot;, Float) = 1.0        _Scroll2X (&quot;2nd layer Scroll Speed&quot;, Float) = 1.0        _Multiplier (&quot;Layer Multiplier&quot;, Float) = 1    &#125;    SubShader &#123;        Tags &#123; &quot;RenderType&quot;=&quot;Opaque&quot; &quot;Queue&quot;=&quot;Geometry&quot;&#125;        Pass &#123;             Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            CGPROGRAM            #pragma vertex vert            #pragma fragment frag            #include &quot;UnityCG.cginc&quot;            sampler2D _MainTex;            sampler2D _DetailTex;            float4 _MainTex_ST;            float4 _DetailTex_ST;            float _ScrollX;            float _Scroll2X;            float _Multiplier;            struct a2v &#123;                float4 vertex : POSITION;                float4 texcoord : TEXCOORD0;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float4 uv : TEXCOORD0;            &#125;;            v2f vert (a2v v) &#123;                v2f o;                o.pos = UnityObjectToClipPos(v.vertex);                o.uv.xy = TRANSFORM_TEX(v.texcoord, _MainTex) + frac(float2(_ScrollX, 0.0) * _Time.y);                o.uv.zw = TRANSFORM_TEX(v.texcoord, _DetailTex) + frac(float2(_Scroll2X, 0.0) * _Time.y);                return o;            &#125;            fixed4 frag (v2f i) : SV_Target &#123;                fixed4 firstLayer = tex2D(_MainTex, i.uv.xy);                fixed4 secondLayer = tex2D(_DetailTex, i.uv.zw);                fixed4 c = lerp(firstLayer, secondLayer, secondLayer.a);                c.rgb *= _Multiplier;                return c;            &#125;            ENDCG        &#125;    &#125;    FallBack &quot;VertexLit&quot;&#125;</code></pre>]]></content>
       
       
       <categories>
@@ -911,6 +820,37 @@
     
     
     <entry>
+      <title>高斯模糊</title>
+      <link href="/posts/a45cef5f.html"/>
+      <url>/posts/a45cef5f.html</url>
+      
+        <content type="html"><![CDATA[<h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p>利用另一个算子，均值滤波器，这个算子的作用可以平均邻域内的像素，从而达到模糊的效果</p><p>高斯滤波：很好的模拟了邻域每个像素对当前像素的影响程度：距离越近，影响越大。高斯核的维数越高，模糊程度越大。</p><h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><p>把5x5的高斯核变成横向和纵向的两个一位高斯核，用两个pass来得到最后的图像，通过图像缩放提高性能，通过应用次数来控制模糊程度</p><p>脚本类：</p><pre><code class="lang-c#">using UnityEngine;using System.Collections;public class GaussianBlur : PostEffectsBase &#123;    public Shader gaussianBlurShader;    private Material gaussianBlurMaterial = null;    public Material material &#123;          get &#123;            gaussianBlurMaterial = CheckShaderAndCreateMaterial(gaussianBlurShader, gaussianBlurMaterial);            return gaussianBlurMaterial;        &#125;      &#125;    // Blur iterations - larger number means more blur.    //迭代次数，模糊范围，缩放系数    [Range(0, 4)]    public int iterations = 3;    // Blur spread for each iteration - larger value means more blur    [Range(0.2f, 3.0f)]    public float blurSpread = 0.6f;    [Range(1, 8)]    public int downSample = 2;    /// 1st edition: just apply blur//    void OnRenderImage(RenderTexture src, RenderTexture dest) &#123;//        if (material != null) &#123;//            int rtW = src.width;//            int rtH = src.height;//通过该函数分配了一块与屏幕图像大小相同的缓冲区，用来存放第一个pass的结果//            RenderTexture buffer = RenderTexture.GetTemporary(rtW, rtH, 0);////            // Render the vertical pass//            Graphics.Blit(src, buffer, material, 0);//            // Render the horizontal pass//            Graphics.Blit(buffer, dest, material, 1);////            RenderTexture.ReleaseTemporary(buffer);//        &#125; else &#123;//            Graphics.Blit(src, dest);//        &#125;//    &#125;     /// 2nd edition: scale the render texture//    void OnRenderImage (RenderTexture src, RenderTexture dest) &#123;//        if (material != null) //让缓冲区大小缩小，使用双线性插值，当把图片导出缓冲区的时候，多个像素归并为一个，可以减少像素数，可以提供性能的同时提供更好的模糊效果//            int rtW = src.width/downSample;//            int rtH = src.height/downSample;//            RenderTexture buffer = RenderTexture.GetTemporary(rtW, rtH, 0);//            buffer.filterMode = FilterMode.Bilinear;////            // Render the vertical pass//            Graphics.Blit(src, buffer, material, 0);//            // Render the horizontal pass//            Graphics.Blit(buffer, dest, material, 1);////            RenderTexture.ReleaseTemporary(buffer);//        &#125; else &#123;//            Graphics.Blit(src, dest);//        &#125;//    &#125;    /// 3rd edition: use iterations for larger blur    void OnRenderImage (RenderTexture src, RenderTexture dest) &#123;        if (material != null) &#123;            int rtW = src.width/downSample;            int rtH = src.height/downSample;            RenderTexture buffer0 = RenderTexture.GetTemporary(rtW, rtH, 0);            buffer0.filterMode = FilterMode.Bilinear;            Graphics.Blit(src, buffer0);            for (int i = 0; i &lt; iterations; i++) &#123;                //每一次迭代的时候，都扩大模糊范围                material.SetFloat(&quot;_BlurSize&quot;, 1.0f + i * blurSpread);                RenderTexture buffer1 = RenderTexture.GetTemporary(rtW, rtH, 0);                // Render the vertical pass                Graphics.Blit(buffer0, buffer1, material, 0);                RenderTexture.ReleaseTemporary(buffer0);                buffer0 = buffer1;                buffer1 = RenderTexture.GetTemporary(rtW, rtH, 0);                // Render the horizontal pass                Graphics.Blit(buffer0, buffer1, material, 1);                RenderTexture.ReleaseTemporary(buffer0);                buffer0 = buffer1;            &#125;            Graphics.Blit(buffer0, dest);            RenderTexture.ReleaseTemporary(buffer0);        &#125; else &#123;            Graphics.Blit(src, dest);        &#125;    &#125;&#125;</code></pre><h1 id="shader"><a href="#shader" class="headerlink" title="shader"></a>shader</h1><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 12/Gaussian Blur&quot; &#123;    Properties &#123;        _MainTex (&quot;Base (RGB)&quot;, 2D) = &quot;white&quot; &#123;&#125;        _BlurSize (&quot;Blur Size&quot;, Float) = 1.0    &#125;    SubShader &#123;        CGINCLUDE        #include &quot;UnityCG.cginc&quot;        sampler2D _MainTex;          half4 _MainTex_TexelSize;        float _BlurSize;        struct v2f &#123;            float4 pos : SV_POSITION;            half2 uv[5]: TEXCOORD0;        &#125;;        v2f vertBlurVertical(appdata_img v) &#123;            v2f o;            o.pos = UnityObjectToClipPos(v.vertex);            half2 uv = v.texcoord;            o.uv[0] = uv;            o.uv[1] = uv + float2(0.0, _MainTex_TexelSize.y * 1.0) * _BlurSize;            o.uv[2] = uv - float2(0.0, _MainTex_TexelSize.y * 1.0) * _BlurSize;            o.uv[3] = uv + float2(0.0, _MainTex_TexelSize.y * 2.0) * _BlurSize;            o.uv[4] = uv - float2(0.0, _MainTex_TexelSize.y * 2.0) * _BlurSize;            return o;        &#125;        v2f vertBlurHorizontal(appdata_img v) &#123;            v2f o;            o.pos = UnityObjectToClipPos(v.vertex);            half2 uv = v.texcoord;            o.uv[0] = uv;            o.uv[1] = uv + float2(_MainTex_TexelSize.x * 1.0, 0.0) * _BlurSize;            o.uv[2] = uv - float2(_MainTex_TexelSize.x * 1.0, 0.0) * _BlurSize;            o.uv[3] = uv + float2(_MainTex_TexelSize.x * 2.0, 0.0) * _BlurSize;            o.uv[4] = uv - float2(_MainTex_TexelSize.x * 2.0, 0.0) * _BlurSize;            return o;        &#125;        fixed4 fragBlur(v2f i) : SV_Target &#123;        //由于5x5，其实是对称的，所以只需要知道一边的参数值就行            float weight[3] = &#123;0.4026, 0.2442, 0.0545&#125;;            fixed3 sum = tex2D(_MainTex, i.uv[0]).rgb * weight[0];            for (int it = 1; it &lt; 3; it++) &#123;                sum += tex2D(_MainTex, i.uv[it*2-1]).rgb * weight[it];                sum += tex2D(_MainTex, i.uv[it*2]).rgb * weight[it];            &#125;            return fixed4(sum, 1.0);        &#125;        ENDCG        ZTest Always Cull Off ZWrite Off        Pass &#123;            NAME &quot;GAUSSIAN_BLUR_VERTICAL&quot;            CGPROGRAM            #pragma vertex vertBlurVertical              #pragma fragment fragBlur            ENDCG          &#125;        Pass &#123;              NAME &quot;GAUSSIAN_BLUR_HORIZONTAL&quot;            CGPROGRAM              #pragma vertex vertBlurHorizontal              #pragma fragment fragBlur            ENDCG        &#125;    &#125;     FallBack &quot;Diffuse&quot;&#125;</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> unity shader 入门精要总结 </category>
+          
+          <category> 第十二章：屏幕后处理 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ShaderLab </tag>
+            
+            <tag> unity </tag>
+            
+            <tag> 屏幕后处理 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>运动模糊</title>
       <link href="/posts/e53f72a2.html"/>
       <url>/posts/e53f72a2.html</url>
@@ -942,18 +882,18 @@
     
     
     <entry>
-      <title>高斯模糊</title>
-      <link href="/posts/a45cef5f.html"/>
-      <url>/posts/a45cef5f.html</url>
+      <title>渲染纹理</title>
+      <link href="/posts/3ae1c68d.html"/>
+      <url>/posts/3ae1c68d.html</url>
       
-        <content type="html"><![CDATA[<h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p>利用另一个算子，均值滤波器，这个算子的作用可以平均邻域内的像素，从而达到模糊的效果</p><p>高斯滤波：很好的模拟了邻域每个像素对当前像素的影响程度：距离越近，影响越大。高斯核的维数越高，模糊程度越大。</p><h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><p>把5x5的高斯核变成横向和纵向的两个一位高斯核，用两个pass来得到最后的图像，通过图像缩放提高性能，通过应用次数来控制模糊程度</p><p>脚本类：</p><pre><code class="lang-c#">using UnityEngine;using System.Collections;public class GaussianBlur : PostEffectsBase &#123;    public Shader gaussianBlurShader;    private Material gaussianBlurMaterial = null;    public Material material &#123;          get &#123;            gaussianBlurMaterial = CheckShaderAndCreateMaterial(gaussianBlurShader, gaussianBlurMaterial);            return gaussianBlurMaterial;        &#125;      &#125;    // Blur iterations - larger number means more blur.    //迭代次数，模糊范围，缩放系数    [Range(0, 4)]    public int iterations = 3;    // Blur spread for each iteration - larger value means more blur    [Range(0.2f, 3.0f)]    public float blurSpread = 0.6f;    [Range(1, 8)]    public int downSample = 2;    /// 1st edition: just apply blur//    void OnRenderImage(RenderTexture src, RenderTexture dest) &#123;//        if (material != null) &#123;//            int rtW = src.width;//            int rtH = src.height;//通过该函数分配了一块与屏幕图像大小相同的缓冲区，用来存放第一个pass的结果//            RenderTexture buffer = RenderTexture.GetTemporary(rtW, rtH, 0);////            // Render the vertical pass//            Graphics.Blit(src, buffer, material, 0);//            // Render the horizontal pass//            Graphics.Blit(buffer, dest, material, 1);////            RenderTexture.ReleaseTemporary(buffer);//        &#125; else &#123;//            Graphics.Blit(src, dest);//        &#125;//    &#125;     /// 2nd edition: scale the render texture//    void OnRenderImage (RenderTexture src, RenderTexture dest) &#123;//        if (material != null) //让缓冲区大小缩小，使用双线性插值，当把图片导出缓冲区的时候，多个像素归并为一个，可以减少像素数，可以提供性能的同时提供更好的模糊效果//            int rtW = src.width/downSample;//            int rtH = src.height/downSample;//            RenderTexture buffer = RenderTexture.GetTemporary(rtW, rtH, 0);//            buffer.filterMode = FilterMode.Bilinear;////            // Render the vertical pass//            Graphics.Blit(src, buffer, material, 0);//            // Render the horizontal pass//            Graphics.Blit(buffer, dest, material, 1);////            RenderTexture.ReleaseTemporary(buffer);//        &#125; else &#123;//            Graphics.Blit(src, dest);//        &#125;//    &#125;    /// 3rd edition: use iterations for larger blur    void OnRenderImage (RenderTexture src, RenderTexture dest) &#123;        if (material != null) &#123;            int rtW = src.width/downSample;            int rtH = src.height/downSample;            RenderTexture buffer0 = RenderTexture.GetTemporary(rtW, rtH, 0);            buffer0.filterMode = FilterMode.Bilinear;            Graphics.Blit(src, buffer0);            for (int i = 0; i &lt; iterations; i++) &#123;                //每一次迭代的时候，都扩大模糊范围                material.SetFloat(&quot;_BlurSize&quot;, 1.0f + i * blurSpread);                RenderTexture buffer1 = RenderTexture.GetTemporary(rtW, rtH, 0);                // Render the vertical pass                Graphics.Blit(buffer0, buffer1, material, 0);                RenderTexture.ReleaseTemporary(buffer0);                buffer0 = buffer1;                buffer1 = RenderTexture.GetTemporary(rtW, rtH, 0);                // Render the horizontal pass                Graphics.Blit(buffer0, buffer1, material, 1);                RenderTexture.ReleaseTemporary(buffer0);                buffer0 = buffer1;            &#125;            Graphics.Blit(buffer0, dest);            RenderTexture.ReleaseTemporary(buffer0);        &#125; else &#123;            Graphics.Blit(src, dest);        &#125;    &#125;&#125;</code></pre><h1 id="shader"><a href="#shader" class="headerlink" title="shader"></a>shader</h1><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 12/Gaussian Blur&quot; &#123;    Properties &#123;        _MainTex (&quot;Base (RGB)&quot;, 2D) = &quot;white&quot; &#123;&#125;        _BlurSize (&quot;Blur Size&quot;, Float) = 1.0    &#125;    SubShader &#123;        CGINCLUDE        #include &quot;UnityCG.cginc&quot;        sampler2D _MainTex;          half4 _MainTex_TexelSize;        float _BlurSize;        struct v2f &#123;            float4 pos : SV_POSITION;            half2 uv[5]: TEXCOORD0;        &#125;;        v2f vertBlurVertical(appdata_img v) &#123;            v2f o;            o.pos = UnityObjectToClipPos(v.vertex);            half2 uv = v.texcoord;            o.uv[0] = uv;            o.uv[1] = uv + float2(0.0, _MainTex_TexelSize.y * 1.0) * _BlurSize;            o.uv[2] = uv - float2(0.0, _MainTex_TexelSize.y * 1.0) * _BlurSize;            o.uv[3] = uv + float2(0.0, _MainTex_TexelSize.y * 2.0) * _BlurSize;            o.uv[4] = uv - float2(0.0, _MainTex_TexelSize.y * 2.0) * _BlurSize;            return o;        &#125;        v2f vertBlurHorizontal(appdata_img v) &#123;            v2f o;            o.pos = UnityObjectToClipPos(v.vertex);            half2 uv = v.texcoord;            o.uv[0] = uv;            o.uv[1] = uv + float2(_MainTex_TexelSize.x * 1.0, 0.0) * _BlurSize;            o.uv[2] = uv - float2(_MainTex_TexelSize.x * 1.0, 0.0) * _BlurSize;            o.uv[3] = uv + float2(_MainTex_TexelSize.x * 2.0, 0.0) * _BlurSize;            o.uv[4] = uv - float2(_MainTex_TexelSize.x * 2.0, 0.0) * _BlurSize;            return o;        &#125;        fixed4 fragBlur(v2f i) : SV_Target &#123;        //由于5x5，其实是对称的，所以只需要知道一边的参数值就行            float weight[3] = &#123;0.4026, 0.2442, 0.0545&#125;;            fixed3 sum = tex2D(_MainTex, i.uv[0]).rgb * weight[0];            for (int it = 1; it &lt; 3; it++) &#123;                sum += tex2D(_MainTex, i.uv[it*2-1]).rgb * weight[it];                sum += tex2D(_MainTex, i.uv[it*2]).rgb * weight[it];            &#125;            return fixed4(sum, 1.0);        &#125;        ENDCG        ZTest Always Cull Off ZWrite Off        Pass &#123;            NAME &quot;GAUSSIAN_BLUR_VERTICAL&quot;            CGPROGRAM            #pragma vertex vertBlurVertical              #pragma fragment fragBlur            ENDCG          &#125;        Pass &#123;              NAME &quot;GAUSSIAN_BLUR_HORIZONTAL&quot;            CGPROGRAM              #pragma vertex vertBlurHorizontal              #pragma fragment fragBlur            ENDCG        &#125;    &#125;     FallBack &quot;Diffuse&quot;&#125;</code></pre>]]></content>
+        <content type="html"><![CDATA[<h1 id="什么是渲染纹理"><a href="#什么是渲染纹理" class="headerlink" title="什么是渲染纹理"></a>什么是渲染纹理</h1><p>GPU允许我们把整个三维场景渲染到一个中间缓冲中，即<strong>渲染目标纹理</strong>，<strong>多重渲染目标</strong>可以把场景渲染到多个渲染目标纹理当中，而不需要为每个目标单独渲染一次整个场景。</p><p>unity为渲染目标纹理定义了一种专门的纹理类型：<strong>渲染纹理</strong></p><p>使用方法：</p><ul><li><p>在project目录下创建渲染纹理，把某个摄像机的渲染纹理目标设置为该渲染纹理。</p><p>该相机的渲染结果会实时更新到渲染纹理当中</p></li><li><p>使用屏幕后处理的方式使用GrabPass和OnRenderImage函数来获得当前屏幕图像。然后就可以进行图像处理。</p></li></ul><h1 id="实现镜子效果"><a href="#实现镜子效果" class="headerlink" title="实现镜子效果"></a>实现镜子效果</h1><p><img src="https://gitee.com/yurain11/drawing-bed/raw/master/img/202304131533969.png" alt="image-20230413153319588"></p><ul><li><p>将希望镜子呈现的图像通过摄像机显示，即在背面设置一个相机，将渲染纹理通过面片显示出来。</p></li><li><p>将渲染纹理赋给shader的texture即可</p></li></ul><pre><code class="lang-c#">//代码如下// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 10/Mirror&quot; &#123;    Properties &#123;        _MainTex (&quot;Main Tex&quot;, 2D) = &quot;white&quot; &#123;&#125;    &#125;    SubShader &#123;        Tags &#123; &quot;RenderType&quot;=&quot;Opaque&quot; &quot;Queue&quot;=&quot;Geometry&quot;&#125;        Pass &#123;            CGPROGRAM            #pragma vertex vert            #pragma fragment frag            sampler2D _MainTex;            struct a2v &#123;                float4 vertex : POSITION;                float3 texcoord : TEXCOORD0;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float2 uv : TEXCOORD0;            &#125;;            v2f vert(a2v v) &#123;                v2f o;                o.pos = UnityObjectToClipPos(v.vertex);                o.uv = v.texcoord;                // Mirror needs to filp x,翻转纹理，用于模拟镜子                o.uv.x = 1 - o.uv.x;                return o;            &#125;            fixed4 frag(v2f i) : SV_Target &#123;                return tex2D(_MainTex, i.uv);            &#125;            ENDCG        &#125;    &#125;      FallBack Off&#125;</code></pre><h1 id="玻璃效果"><a href="#玻璃效果" class="headerlink" title="玻璃效果"></a>玻璃效果</h1><p><img src="https://gitee.com/yurain11/drawing-bed/raw/master/img/202304131631099.png" alt="image-20230413163135832"></p><p>与简单的透明混合不同，使用GrabPass可以对物体后面的图像进行更加复杂的处理，比如使用法线来模拟折射效果。</p><ul><li>GrabPass：unity会把当前屏幕的图像绘制在一张纹理当中。</li><li>通常会使用GrabPass实现例如玻璃等透明材质的模拟</li></ul><h2 id="实现玻璃效果"><a href="#实现玻璃效果" class="headerlink" title="实现玻璃效果"></a>实现玻璃效果</h2><ol><li>使用法线纹理来修改模型的法线</li><li>通过Cubemap模拟玻璃反射</li><li>折射效果通过GrabPass抓取后面的图像进行后处理，使用切线空间的法线对屏幕纹理坐标进行偏移，再采样来模拟折射。</li><li>最终结果中反射通过物体显示，而折射则需要在摄像机中才能实现。</li></ol><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;_Object2World&#39; with &#39;unity_ObjectToWorld&#39;// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 10/Glass Refraction&quot; &#123;    Properties &#123;        _MainTex (&quot;Main Tex&quot;, 2D) = &quot;white&quot; &#123;&#125;        _BumpMap (&quot;Normal Map&quot;, 2D) = &quot;bump&quot; &#123;&#125;        _Cubemap (&quot;Environment Cubemap&quot;, Cube) = &quot;_Skybox&quot; &#123;&#125;        _Distortion (&quot;Distortion&quot;, Range(0, 100)) = 10        _RefractAmount (&quot;Refract Amount&quot;, Range(0.0, 1.0)) = 1.0    &#125;    SubShader &#123;        // We must be transparent, so other objects are drawn before this one.        Tags &#123; &quot;Queue&quot;=&quot;Transparent&quot; &quot;RenderType&quot;=&quot;Opaque&quot; &#125;        // This pass grabs the screen behind the object into a texture.        // We can access the result in the next pass as _RefractionTex        //定义了抓取的图像会被存在哪        GrabPass &#123; &quot;_RefractionTex&quot; &#125;        Pass &#123;                    CGPROGRAM            #pragma vertex vert            #pragma fragment frag            #include &quot;UnityCG.cginc&quot;            sampler2D _MainTex;            float4 _MainTex_ST;            sampler2D _BumpMap;            float4 _BumpMap_ST;            samplerCUBE _Cubemap;            float _Distortion;            fixed _RefractAmount;            sampler2D _RefractionTex;            float4 _RefractionTex_TexelSize;            struct a2v &#123;                float4 vertex : POSITION;                float3 normal : NORMAL;                float4 tangent : TANGENT;                 float2 texcoord: TEXCOORD0;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float4 scrPos : TEXCOORD0;                float4 uv : TEXCOORD1;                float4 TtoW0 : TEXCOORD2;                  float4 TtoW1 : TEXCOORD3;                  float4 TtoW2 : TEXCOORD4;             &#125;;            v2f vert (a2v v) &#123;                v2f o;                o.pos = UnityObjectToClipPos(v.vertex);                //调用内置函数得到被抓取的屏幕图像的采样坐标                o.scrPos = ComputeGrabScreenPos(o.pos);                o.uv.xy = TRANSFORM_TEX(v.texcoord, _MainTex);                o.uv.zw = TRANSFORM_TEX(v.texcoord, _BumpMap);                float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;                  fixed3 worldNormal = UnityObjectToWorldNormal(v.normal);                  fixed3 worldTangent = UnityObjectToWorldDir(v.tangent.xyz);                  fixed3 worldBinormal = cross(worldNormal, worldTangent) * v.tangent.w;                 o.TtoW0 = float4(worldTangent.x, worldBinormal.x, worldNormal.x, worldPos.x);                  o.TtoW1 = float4(worldTangent.y, worldBinormal.y, worldNormal.y, worldPos.y);                  o.TtoW2 = float4(worldTangent.z, worldBinormal.z, worldNormal.z, worldPos.z);                  return o;            &#125;            fixed4 frag (v2f i) : SV_Target &#123;                        float3 worldPos = float3(i.TtoW0.w, i.TtoW1.w, i.TtoW2.w);                fixed3 worldViewDir = normalize(UnityWorldSpaceViewDir(worldPos));                // Get the normal in tangent space                fixed3 bump = UnpackNormal(tex2D(_BumpMap, i.uv.zw));                    // Compute the offset in tangent space                //乘以纹素大小，就是针对每块纹素的法线进行偏移，即可求出偏移量（归一化后的情况）                float2 offset = bump.xy * _Distortion * _RefractionTex_TexelSize.xy;                //将偏移量拓展到屏幕空间，计算出被偏移点的实际屏幕空间坐标                i.scrPos.xy = offset * i.scrPos.z + i.scrPos.xy;                //用被偏移后的坐标去采样原来看到的图像，就可以得到偏移图像                fixed3 refrCol = tex2D(_RefractionTex, i.scrPos.xy/i.scrPos.w).rgb;                // Convert the normal to world space                bump = normalize(half3(dot(i.TtoW0.xyz, bump), dot(i.TtoW1.xyz, bump), dot(i.TtoW2.xyz, bump)));                fixed3 reflDir = reflect(-worldViewDir, bump);                fixed4 texColor = tex2D(_MainTex, i.uv.xy);                fixed3 reflCol = texCUBE(_Cubemap, reflDir).rgb * texColor.rgb;                fixed3 finalColor = reflCol * (1 - _RefractAmount) + refrCol * _RefractAmount;                return fixed4(finalColor, 1);            &#125;            ENDCG        &#125;    &#125;    FallBack &quot;Diffuse&quot;&#125;</code></pre><h1 id="渲染纹理vsGrabPass"><a href="#渲染纹理vsGrabPass" class="headerlink" title="渲染纹理vsGrabPass"></a>渲染纹理vsGrabPass</h1><p>GrabPass实现更加简单，</p><p>渲染纹理的效率更好：因为可以控制渲染的场景大小，而grabPass获取的是和显示屏一致的。</p><p>GrabPass需要CPU直接读取后备缓冲的数据，破坏和GPU的并行性。</p><p>Unity5引入命令缓冲command Buffer，可以得到类似抓屏效果。</p><h1 id="commad-buffers"><a href="#commad-buffers" class="headerlink" title="commad buffers"></a>commad buffers</h1>]]></content>
       
       
       <categories>
           
           <category> unity shader 入门精要总结 </category>
           
-          <category> 第十二章：屏幕后处理 </category>
+          <category> 第十章：程序纹理 </category>
           
       </categories>
       
@@ -964,7 +904,67 @@
             
             <tag> unity </tag>
             
-            <tag> 屏幕后处理 </tag>
+            <tag> 纹理 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>立方体纹理</title>
+      <link href="/posts/fe7c9daf.html"/>
+      <url>/posts/fe7c9daf.html</url>
+      
+        <content type="html"><![CDATA[<h1 id="什么是立方体纹理"><a href="#什么是立方体纹理" class="headerlink" title="什么是立方体纹理"></a>什么是立方体纹理</h1><ul><li><p>立方体纹理是环境映射的一种实现方式。</p></li><li><p>一共包含6张图像</p></li><li><p>好处：实现简单快速，效果好。</p><p>缺点：场景中引入新的物体，光源，或者物体发生移动时需要重新生成。</p><p>不能模拟多次反射的结果</p></li><li><p>尽量对凸面体使用立方体纹理。</p></li></ul><h2 id="天空盒子"><a href="#天空盒子" class="headerlink" title="天空盒子"></a>天空盒子</h2><p>用于模拟背景的一种方式。</p><p>添加天空盒子：</p><ol><li>新建材质，shader选择自带的Skybox/6 sided.</li><li>将图片附上，图片的wrap mode设置为clamp,</li><li>在window-rendering-lighting中的scene中将skybox设置为之前的材质</li><li>该设置会覆盖所有摄像机，如果希望使用不同的，需要给摄像机添加skybox组件。</li></ol><h2 id="创建环境映射的立方体纹理"><a href="#创建环境映射的立方体纹理" class="headerlink" title="创建环境映射的立方体纹理"></a>创建环境映射的立方体纹理</h2><ul><li><p>特殊布局的纹理创建</p><p>需要类似立方体展开图或者全景布局图，将texture type设置为cubemap</p></li><li><p>手动创建Cubemap</p><p>上面的方法</p></li><li><p>脚本生成</p><p>通过unity提供的Camera.RenderToCubemap函数实现，该函数可以把任意位置的场景图像储存到6张图像中。</p><pre><code class="lang-c#">using UnityEngine;using UnityEditor;using System.Collections;public class RenderCubemapWizard : ScriptableWizard &#123;    public Transform renderFromPosition;    public Cubemap cubemap;    void OnWizardUpdate () &#123;        helpString = &quot;Select transform to render from and cubemap to render into&quot;;        isValid = (renderFromPosition != null) &amp;&amp; (cubemap != null);    &#125;    void OnWizardCreate () &#123;        // create temporary camera for rendering        GameObject go = new GameObject( &quot;CubemapCamera&quot;);        go.AddComponent&lt;Camera&gt;();        // place it on the object        go.transform.position = renderFromPosition.position;        // render into cubemap                go.GetComponent&lt;Camera&gt;().RenderToCubemap(cubemap);        // destroy temporary camera        DestroyImmediate( go );    &#125;    [MenuItem(&quot;GameObject/Render into Cubemap&quot;)]    static void RenderCubemap () &#123;        ScriptableWizard.DisplayWizard&lt;RenderCubemapWizard&gt;(            &quot;Render cubemap&quot;, &quot;Render!&quot;);    &#125;&#125;</code></pre><p>通过调用该脚本就可以把一个位置的环境渲染到一个Cubemap当中。</p></li></ul><h2 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h2><ul><li>通过视角方向的反射方向即可知道采样的位置。</li></ul><pre><code class="lang-C#">// Upgrade NOTE: replaced &#39;_Object2World&#39; with &#39;unity_ObjectToWorld&#39;// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 10/Reflection&quot; &#123;    Properties &#123;        _Color (&quot;Color Tint&quot;, Color) = (1, 1, 1, 1)        //控制反射颜色        _ReflectColor (&quot;Reflection Color&quot;, Color) = (1, 1, 1, 1)        //控制反射程度        _ReflectAmount (&quot;Reflect Amount&quot;, Range(0, 1)) = 1        //导入Cubemap        _Cubemap (&quot;Reflection Cubemap&quot;, Cube) = &quot;_Skybox&quot; &#123;&#125;    &#125;    SubShader &#123;        Tags &#123; &quot;RenderType&quot;=&quot;Opaque&quot; &quot;Queue&quot;=&quot;Geometry&quot;&#125;        Pass &#123;             Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            CGPROGRAM            #pragma multi_compile_fwdbase            #pragma vertex vert            #pragma fragment frag            #include &quot;Lighting.cginc&quot;            #include &quot;AutoLight.cginc&quot;            fixed4 _Color;            fixed4 _ReflectColor;            fixed _ReflectAmount;            samplerCUBE _Cubemap;            struct a2v &#123;                float4 vertex : POSITION;                float3 normal : NORMAL;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float3 worldPos : TEXCOORD0;                fixed3 worldNormal : TEXCOORD1;                fixed3 worldViewDir : TEXCOORD2;                fixed3 worldRefl : TEXCOORD3;                SHADOW_COORDS(4)            &#125;;            v2f vert(a2v v) &#123;                v2f o;                o.pos = UnityObjectToClipPos(v.vertex);                o.worldNormal = UnityObjectToWorldNormal(v.normal);                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;                o.worldViewDir = UnityWorldSpaceViewDir(o.worldPos);                // Compute the reflect dir in world space                //通过视角方向计算反射方向，即得到指向环境的方向，通过这个方向在Cubemap中采样                o.worldRefl = reflect(-o.worldViewDir, o.worldNormal);                TRANSFER_SHADOW(o);                return o;            &#125;            fixed4 frag(v2f i) : SV_Target &#123;                fixed3 worldNormal = normalize(i.worldNormal);                fixed3 worldLightDir = normalize(UnityWorldSpaceLightDir(i.worldPos));                        fixed3 worldViewDir = normalize(i.worldViewDir);                        fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;                fixed3 diffuse = _LightColor0.rgb * _Color.rgb * max(0, dot(worldNormal, worldLightDir));                // Use the reflect dir in world space to access the cubemap                fixed3 reflection = texCUBE(_Cubemap, i.worldRefl).rgb * _ReflectColor.rgb;                UNITY_LIGHT_ATTENUATION(atten, i, i.worldPos);                // Mix the diffuse color with the reflected color                //通过反射系数混合漫反射和反射，最后乘上光强衰减系数                fixed3 color = ambient + lerp(diffuse, reflection, _ReflectAmount) * atten;                return fixed4(color, 1.0);            &#125;            ENDCG        &#125;    &#125;    FallBack &quot;Reflective/VertexLit&quot;&#125;</code></pre><h2 id="折射"><a href="#折射" class="headerlink" title="折射"></a>折射</h2><ul><li><p>斯涅尔定律（Snell’s Law）</p><script type="math/tex; mode=display">\eta_1sin\theta_1=\eta_2sin\theta_2</script><p>一般来说需要计算两次折射：射入和射出</p><p>但是实时渲染一般模拟1次折射</p></li></ul><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;_Object2World&#39; with &#39;unity_ObjectToWorld&#39;// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;Shader &quot;Unity Shaders Book/Chapter 10/Refraction&quot; &#123;    Properties &#123;        _Color (&quot;Color Tint&quot;, Color) = (1, 1, 1, 1)        _RefractColor (&quot;Refraction Color&quot;, Color) = (1, 1, 1, 1)        //折射比率        _RefractAmount (&quot;Refraction Amount&quot;, Range(0, 1)) = 1        //不同介质的透射比        _RefractRatio (&quot;Refraction Ratio&quot;, Range(0.1, 1)) = 0.5        _Cubemap (&quot;Refraction Cubemap&quot;, Cube) = &quot;_Skybox&quot; &#123;&#125;    &#125;    SubShader &#123;        Tags &#123; &quot;RenderType&quot;=&quot;Opaque&quot; &quot;Queue&quot;=&quot;Geometry&quot;&#125;        Pass &#123;             Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            CGPROGRAM            #pragma multi_compile_fwdbase                #pragma vertex vert            #pragma fragment frag            #include &quot;Lighting.cginc&quot;            #include &quot;AutoLight.cginc&quot;            fixed4 _Color;            fixed4 _RefractColor;            float _RefractAmount;            fixed _RefractRatio;            samplerCUBE _Cubemap;            struct a2v &#123;                float4 vertex : POSITION;                float3 normal : NORMAL;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float3 worldPos : TEXCOORD0;                fixed3 worldNormal : TEXCOORD1;                fixed3 worldViewDir : TEXCOORD2;                fixed3 worldRefr : TEXCOORD3;                SHADOW_COORDS(4)            &#125;;            v2f vert(a2v v) &#123;                v2f o;                o.pos = UnityObjectToClipPos(v.vertex);                o.worldNormal = UnityObjectToWorldNormal(v.normal);                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;                o.worldViewDir = UnityWorldSpaceViewDir(o.worldPos);                // Compute the refract dir in world space                //需要入射方向，和法线，第三个两个介质的折射率之比，a-&gt;b，re=a/b                o.worldRefr = refract(-normalize(o.worldViewDir), normalize(o.worldNormal), _RefractRatio);                TRANSFER_SHADOW(o);                return o;            &#125;            fixed4 frag(v2f i) : SV_Target &#123;                fixed3 worldNormal = normalize(i.worldNormal);                fixed3 worldLightDir = normalize(UnityWorldSpaceLightDir(i.worldPos));                fixed3 worldViewDir = normalize(i.worldViewDir);                fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;                fixed3 diffuse = _LightColor0.rgb * _Color.rgb * max(0, dot(worldNormal, worldLightDir));                // Use the refract dir in world space to access the cubemap                fixed3 refraction = texCUBE(_Cubemap, i.worldRefr).rgb * _RefractColor.rgb;                UNITY_LIGHT_ATTENUATION(atten, i, i.worldPos);                // Mix the diffuse color with the refract color                fixed3 color = ambient + lerp(diffuse, refraction, _RefractAmount) * atten;                return fixed4(color, 1.0);            &#125;            ENDCG        &#125;    &#125;     FallBack &quot;Reflective/VertexLit&quot;&#125;</code></pre><h2 id="菲涅尔反射"><a href="#菲涅尔反射" class="headerlink" title="菲涅尔反射"></a>菲涅尔反射</h2><p>原理：当光线照射到物体表面时，一部分反射，一部分发生折射和散射，被反射的光和入射光存在一定的比率关系。</p><p>菲涅尔等式：</p><p>近似公式：Schlick 菲涅尔近似等式：</p><script type="math/tex; mode=display">F_{Schlick}(v,n)=F_0+(1-F_0)(1-v·n)^5</script><p>F~0~是反射系数，控制反射强度，v是视角方向，n是法线</p><p>应用广泛的等式是Empricial菲涅尔近似等式：</p><script type="math/tex; mode=display">F_{Empricial}(v,n)=max(0,min(1,bias+scale\times(1-v·n)^{power}))</script><p>三个英文是控制项</p><pre><code class="lang-c#">// Upgrade NOTE: replaced &#39;_Object2World&#39; with &#39;unity_ObjectToWorld&#39;// Upgrade NOTE: replaced &#39;mul(UNITY_MATRIX_MVP,*)&#39; with &#39;UnityObjectToClipPos(*)&#39;//schlickjShader &quot;Unity Shaders Book/Chapter 10/Fresnel&quot; &#123;    Properties &#123;        _Color (&quot;Color Tint&quot;, Color) = (1, 1, 1, 1)        _FresnelScale (&quot;Fresnel Scale&quot;, Range(0, 1)) = 0.5        _Cubemap (&quot;Reflection Cubemap&quot;, Cube) = &quot;_Skybox&quot; &#123;&#125;    &#125;    SubShader &#123;        Tags &#123; &quot;RenderType&quot;=&quot;Opaque&quot; &quot;Queue&quot;=&quot;Geometry&quot;&#125;        Pass &#123;             Tags &#123; &quot;LightMode&quot;=&quot;ForwardBase&quot; &#125;            CGPROGRAM            #pragma multi_compile_fwdbase            #pragma vertex vert            #pragma fragment frag            #include &quot;Lighting.cginc&quot;            #include &quot;AutoLight.cginc&quot;            fixed4 _Color;            fixed _FresnelScale;            samplerCUBE _Cubemap;            struct a2v &#123;                float4 vertex : POSITION;                float3 normal : NORMAL;            &#125;;            struct v2f &#123;                float4 pos : SV_POSITION;                float3 worldPos : TEXCOORD0;                  fixed3 worldNormal : TEXCOORD1;                  fixed3 worldViewDir : TEXCOORD2;                  fixed3 worldRefl : TEXCOORD3;                  SHADOW_COORDS(4)            &#125;;            v2f vert(a2v v) &#123;                v2f o;                o.pos = UnityObjectToClipPos(v.vertex);                o.worldNormal = UnityObjectToWorldNormal(v.normal);                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;                o.worldViewDir = UnityWorldSpaceViewDir(o.worldPos);                o.worldRefl = reflect(-o.worldViewDir, o.worldNormal);                TRANSFER_SHADOW(o);                return o;            &#125;            fixed4 frag(v2f i) : SV_Target &#123;                fixed3 worldNormal = normalize(i.worldNormal);                fixed3 worldLightDir = normalize(UnityWorldSpaceLightDir(i.worldPos));                fixed3 worldViewDir = normalize(i.worldViewDir);                fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;                UNITY_LIGHT_ATTENUATION(atten, i, i.worldPos);                fixed3 reflection = texCUBE(_Cubemap, i.worldRefl).rgb;                fixed fresnel = _FresnelScale + (1 - _FresnelScale) * pow(1 - dot(worldViewDir, worldNormal), 5);                fixed3 diffuse = _LightColor0.rgb * _Color.rgb * max(0, dot(worldNormal, worldLightDir));                //通过菲涅尔系数控制漫反射和反射的混合程度                fixed3 color = ambient + lerp(diffuse, reflection, saturate(fresnel)) * atten;                return fixed4(color, 1.0);            &#125;            ENDCG        &#125;    &#125;     FallBack &quot;Reflective/VertexLit&quot;&#125;</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> unity shader 入门精要总结 </category>
+          
+          <category> 第十章：程序纹理 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ShaderLab </tag>
+            
+            <tag> unity </tag>
+            
+            <tag> 纹理 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>程序纹理</title>
+      <link href="/posts/b3314196.html"/>
+      <url>/posts/b3314196.html</url>
+      
+        <content type="html"><![CDATA[<h1 id="什么是程序纹理"><a href="#什么是程序纹理" class="headerlink" title="什么是程序纹理"></a>什么是程序纹理</h1><p>通过算法创建个性图案或者非常真实的自然元素</p><h1 id="实现程序材质"><a href="#实现程序材质" class="headerlink" title="实现程序材质"></a>实现程序材质</h1><p>通过脚本创建程序纹理</p><p>通过Substance Designer创建程序纹理和材质</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> unity shader 入门精要总结 </category>
+          
+          <category> 第十章：程序纹理 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ShaderLab </tag>
+            
+            <tag> 纹理 </tag>
             
         </tags>
       
@@ -1081,11 +1081,11 @@
     
     
     <entry>
-      <title>2.5 什么是shader</title>
-      <link href="/posts/945c8b95.html"/>
-      <url>/posts/945c8b95.html</url>
+      <title>2.3 GPU流水线</title>
+      <link href="/posts/aacc2f5b.html"/>
+      <url>/posts/aacc2f5b.html</url>
       
-        <content type="html"><![CDATA[<h1 id="Shader究竟是什么"><a href="#Shader究竟是什么" class="headerlink" title="Shader究竟是什么"></a>Shader究竟是什么</h1><ul><li>GPU流水线上高度可编程的阶段</li><li>重点是顶点着色器控制顶点变换和传递数据，片元着色器进行逐片元的渲染。S</li></ul>]]></content>
+        <content type="html"><![CDATA[<h1 id="GPU流水线"><a href="#GPU流水线" class="headerlink" title="GPU流水线"></a>GPU流水线</h1><p>说人话：几何阶段+光栅化阶</p><p><img src="https://gitee.com/yurain11/drawing-bed/raw/master/img/image-20230401140240022.png" alt="image-20230401140240022"></p><h2 id="几何阶段"><a href="#几何阶段" class="headerlink" title="几何阶段"></a>几何阶段</h2><ol><li><p>顶点着色器</p><p>vertex shader:完全可编程。实现顶点的空间变换，顶点着色。</p></li><li><p>曲面细分着色器</p><p>Tessellation Shader:可选着色器。用于细分图元</p></li><li><p>几何着色器</p><p>Geometry Shader:可选着色器。用于执行逐图元的着色操作，或产生更多图元。</p></li><li><p>裁剪</p><p>clipping:可配置。裁剪掉不在摄像机视野内的顶点和剔除某些面片</p><p>针对对象：部分在视野内的图元（不可编程，但可以自定一个裁剪操作）</p></li><li><p>屏幕映射</p><p>screen mapping:不可配置和编程的。用于把每个图元的坐标转换到屏幕坐标系当中。</p><p>输入：三维坐标（范围在单位正方体：即经过正交投影后的三维坐标）</p><p>需要注意OpenGL和DirectX屏幕坐标系的不同：OpenGL在左下，DirectX在左上。</p></li></ol><h3 id="顶点着色器"><a href="#顶点着色器" class="headerlink" title="顶点着色器"></a>顶点着色器</h3><p>输入：CPU</p><p>处理单位：顶点（每个顶点调用一次顶点着色器）</p><p>限制：无法创建和销毁顶点，无法获得两个顶点的相关联系（逐顶点计算）</p><p>优点：处理速度快（不用考虑关联性，GPU狂喜）</p><p>工作：</p><ul><li>坐标变换：<strong>把顶点坐标从模型空间转换到齐次裁剪空间</strong>，以及其他需求所需的顶点变换。</li><li>逐顶点光照</li></ul><h2 id="光栅化阶段"><a href="#光栅化阶段" class="headerlink" title="光栅化阶段"></a>光栅化阶段</h2><ol><li><p>三角形设置</p><p>输入：顶点</p><p>输出：顶点所构成的边的表示方式（三角形框）</p></li><li><p>三角形遍历Triangle Traversal（扫描变化）</p><p>工作：检查每个像素是否被三角所覆盖</p><p>输出：片元（包含被覆盖的像素，以及屏幕坐标，深度信息，法线，纹理坐标等等）而不仅仅是一个像素。</p></li><li><p>片元着色器Fragment Shader（像素着色器Pixel Shader）</p></li><li><p>逐片元操作Per-Fragment Operations(输出合并阶段Output-Merger)</p></li></ol><h3 id="片元着色器"><a href="#片元着色器" class="headerlink" title="片元着色器"></a>片元着色器</h3><p>输入：对顶点信息进行插值的像素信息（对顶点着色器输出的信息插值）</p><p>输出：一个或者多个颜色值</p><p>使用包括：纹理采样。通过对顶点纹理坐标的插值，就可以或者中间信息的纹理坐标。</p><p>局限：只正对单个片元，无法将结果传输给其他片元。</p><h3 id="逐片元操作：高度可配置性"><a href="#逐片元操作：高度可配置性" class="headerlink" title="逐片元操作：高度可配置性"></a>逐片元操作：高度可配置性</h3><p>任务：</p><ul><li>决定片元的可见性</li><li>对通过所有测试的片元的颜色值和储存在颜色缓冲区的颜色合并</li></ul><p>过程：</p><ol><li><p>模板测试Stencil test</p><p>读取片元模板值,将该值和预定值比较，比较条件自己定义，不符合条件则舍弃。一般用来限制渲染区域。（渲染阴影，轮廓渲染）</p></li><li><p>深度测试</p><p>深度就是指离屏幕的远近。根据深度值的选取条件，就可以实现基本的遮挡，以及进阶的透明等效果。也是高度自定义的。</p><p>一般来说在unity中深度测试会放在片元着色前（Early-Z）,避免着色器计算不需要的颜色。（但是在透明情况下需要关闭）</p></li><li><p>混合</p><p>关闭混合：直接覆盖颜色缓冲区的值</p><p>开启混合：可以定义混合条件，达到不同的颜色混合效果，就是PS里面的图层叠加方式（正片叠底等）</p></li><li><p>双重缓冲：保证画面连续（交替显示（避免出现渲染一半的画面））</p></li></ol>]]></content>
       
       
       <categories>
@@ -1108,11 +1108,11 @@
     
     
     <entry>
-      <title>2.3 GPU流水线</title>
-      <link href="/posts/aacc2f5b.html"/>
-      <url>/posts/aacc2f5b.html</url>
+      <title>2.5 什么是shader</title>
+      <link href="/posts/945c8b95.html"/>
+      <url>/posts/945c8b95.html</url>
       
-        <content type="html"><![CDATA[<h1 id="GPU流水线"><a href="#GPU流水线" class="headerlink" title="GPU流水线"></a>GPU流水线</h1><p>说人话：几何阶段+光栅化阶</p><p><img src="https://gitee.com/yurain11/drawing-bed/raw/master/img/image-20230401140240022.png" alt="image-20230401140240022"></p><h2 id="几何阶段"><a href="#几何阶段" class="headerlink" title="几何阶段"></a>几何阶段</h2><ol><li><p>顶点着色器</p><p>vertex shader:完全可编程。实现顶点的空间变换，顶点着色。</p></li><li><p>曲面细分着色器</p><p>Tessellation Shader:可选着色器。用于细分图元</p></li><li><p>几何着色器</p><p>Geometry Shader:可选着色器。用于执行逐图元的着色操作，或产生更多图元。</p></li><li><p>裁剪</p><p>clipping:可配置。裁剪掉不在摄像机视野内的顶点和剔除某些面片</p><p>针对对象：部分在视野内的图元（不可编程，但可以自定一个裁剪操作）</p></li><li><p>屏幕映射</p><p>screen mapping:不可配置和编程的。用于把每个图元的坐标转换到屏幕坐标系当中。</p><p>输入：三维坐标（范围在单位正方体：即经过正交投影后的三维坐标）</p><p>需要注意OpenGL和DirectX屏幕坐标系的不同：OpenGL在左下，DirectX在左上。</p></li></ol><h3 id="顶点着色器"><a href="#顶点着色器" class="headerlink" title="顶点着色器"></a>顶点着色器</h3><p>输入：CPU</p><p>处理单位：顶点（每个顶点调用一次顶点着色器）</p><p>限制：无法创建和销毁顶点，无法获得两个顶点的相关联系（逐顶点计算）</p><p>优点：处理速度快（不用考虑关联性，GPU狂喜）</p><p>工作：</p><ul><li>坐标变换：<strong>把顶点坐标从模型空间转换到齐次裁剪空间</strong>，以及其他需求所需的顶点变换。</li><li>逐顶点光照</li></ul><h2 id="光栅化阶段"><a href="#光栅化阶段" class="headerlink" title="光栅化阶段"></a>光栅化阶段</h2><ol><li><p>三角形设置</p><p>输入：顶点</p><p>输出：顶点所构成的边的表示方式（三角形框）</p></li><li><p>三角形遍历Triangle Traversal（扫描变化）</p><p>工作：检查每个像素是否被三角所覆盖</p><p>输出：片元（包含被覆盖的像素，以及屏幕坐标，深度信息，法线，纹理坐标等等）而不仅仅是一个像素。</p></li><li><p>片元着色器Fragment Shader（像素着色器Pixel Shader）</p></li><li><p>逐片元操作Per-Fragment Operations(输出合并阶段Output-Merger)</p></li></ol><h3 id="片元着色器"><a href="#片元着色器" class="headerlink" title="片元着色器"></a>片元着色器</h3><p>输入：对顶点信息进行插值的像素信息（对顶点着色器输出的信息插值）</p><p>输出：一个或者多个颜色值</p><p>使用包括：纹理采样。通过对顶点纹理坐标的插值，就可以或者中间信息的纹理坐标。</p><p>局限：只正对单个片元，无法将结果传输给其他片元。</p><h3 id="逐片元操作：高度可配置性"><a href="#逐片元操作：高度可配置性" class="headerlink" title="逐片元操作：高度可配置性"></a>逐片元操作：高度可配置性</h3><p>任务：</p><ul><li>决定片元的可见性</li><li>对通过所有测试的片元的颜色值和储存在颜色缓冲区的颜色合并</li></ul><p>过程：</p><ol><li><p>模板测试Stencil test</p><p>读取片元模板值,将该值和预定值比较，比较条件自己定义，不符合条件则舍弃。一般用来限制渲染区域。（渲染阴影，轮廓渲染）</p></li><li><p>深度测试</p><p>深度就是指离屏幕的远近。根据深度值的选取条件，就可以实现基本的遮挡，以及进阶的透明等效果。也是高度自定义的。</p><p>一般来说在unity中深度测试会放在片元着色前（Early-Z）,避免着色器计算不需要的颜色。（但是在透明情况下需要关闭）</p></li><li><p>混合</p><p>关闭混合：直接覆盖颜色缓冲区的值</p><p>开启混合：可以定义混合条件，达到不同的颜色混合效果，就是PS里面的图层叠加方式（正片叠底等）</p></li><li><p>双重缓冲：保证画面连续（交替显示（避免出现渲染一半的画面））</p></li></ol>]]></content>
+        <content type="html"><![CDATA[<h1 id="Shader究竟是什么"><a href="#Shader究竟是什么" class="headerlink" title="Shader究竟是什么"></a>Shader究竟是什么</h1><ul><li>GPU流水线上高度可编程的阶段</li><li>重点是顶点着色器控制顶点变换和传递数据，片元着色器进行逐片元的渲染。S</li></ul>]]></content>
       
       
       <categories>
