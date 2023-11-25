@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>git安装和配置</title>
+      <link href="/posts/af9d867.html"/>
+      <url>/posts/af9d867.html</url>
+      
+        <content type="html"><![CDATA[<h1 id="为什么要使用git"><a href="#为什么要使用git" class="headerlink" title="为什么要使用git"></a>为什么要使用git</h1><ol><li>版本控制：git可以存储不同时间段的版本，你可以自由的控制你当前的版本。</li><li>多人协作：git可以提供分支，供不同人开发，开发完毕后，可以合并，用户可以自由控制合并内容。</li><li>利用各种支持git的平台云端处理项目，比如github，gitee等。</li><li>为什么不用git?除非你有其他的版本控制软件。</li></ol><h1 id="git的安装"><a href="#git的安装" class="headerlink" title="git的安装"></a>git的安装</h1><p>下载链接：<a href="https://git-scm.com/download/win">Git - Downloading Package (git-scm.com)</a></p><p>安装详细教程：<a href="https://zhuanlan.zhihu.com/p/597447255">git的安装与配置（详细） - 知乎 (zhihu.com)</a></p><p>设置完安装地址后点next就行。</p><p>安装完成后</p><p>桌面右键git bush here</p><p>建议设置为管理员启动：我们有时使用git安装可能需要管理员权限。</p><p>在安装目录下找到git-bush.exe,右键属性-&gt;兼容性-&gt;以管理员启动</p><p>进入git bush</p><ol><li><p>配置邮箱和用户名</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name &quot;名字&quot;</span><br><span class="line">git config --global user.email  邮箱</span><br></pre></td></tr></table></figure></li><li><p>生成密匙：密匙的目的是为了将电脑与github等平台的账号关联，这样就不需要输密码就可以传输文件。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa //再敲三次回车</span><br></pre></td></tr></table></figure><p>生成位置：文件目录-C:\Users\用户名.ssh，看不到就勾选隐藏项。</p></li><li><p>将公匙.pub提供给平台即可管理，在账号那里找SSH key即可。</p><p>具体流程：setting-&gt;SSH and GPG keys-&gt;add new SSH Key</p><p><img src="https://yrain11.oss-cn-hangzhou.aliyuncs.com/pictures/202311252220049.png" alt="image-20231125222049959"></p></li></ol><h1 id="使用github客户端来管理仓库（只针对github）"><a href="#使用github客户端来管理仓库（只针对github）" class="headerlink" title="使用github客户端来管理仓库（只针对github）"></a>使用github客户端来管理仓库（只针对github）</h1><h2 id="安装链接"><a href="#安装链接" class="headerlink" title="安装链接"></a>安装链接</h2><p><a href="https://desktop.github.com/">GitHub Desktop | Simple collaboration from your desktop</a></p><p>使用教程：<a href="https://www.cnblogs.com/opsprobe/p/9893325.html">GitHub的Windows客户端的使用教程 - OpsDrip - 博客园 (cnblogs.com)</a></p><p>好处：高度可视化，不用敲git的代码即可实现管理。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 教程 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> git </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Hello World</title>
       <link href="/posts/4a17b156.html"/>
       <url>/posts/4a17b156.html</url>
