@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>使用github管理unity项目</title>
+      <link href="/posts/61d679a7.html"/>
+      <url>/posts/61d679a7.html</url>
+      
+        <content type="html"><![CDATA[<h1 id="仓库的上传和下载（基于github桌面端）"><a href="#仓库的上传和下载（基于github桌面端）" class="headerlink" title="仓库的上传和下载（基于github桌面端）"></a>仓库的上传和下载（基于github桌面端）</h1><h2 id="仓库的创建"><a href="#仓库的创建" class="headerlink" title="仓库的创建"></a>仓库的创建</h2><ol><li>创建一个新的仓库</li></ol><p><img src="https://yrain11.oss-cn-hangzhou.aliyuncs.com/pictures/202311261445475.png" alt="image-20231126144543368"></p><ol start="2"><li><p>选择仓库位置，是否创建readme文件，git ignore选择unity，这样可以去除unity系统文件，凭证按需选择</p><p><img src="https://yrain11.oss-cn-hangzhou.aliyuncs.com/pictures/202311261447423.png" alt="image-20231126144758338"></p></li><li><p>在unity中创建项目时，选择这个仓库地址即可。这样本地的git仓库就完成了。</p></li><li><p>如果你已经创建了unity的项目，就把项目移动到这个仓库即可。</p></li></ol><h2 id="仓库的上传"><a href="#仓库的上传" class="headerlink" title="仓库的上传"></a>仓库的上传</h2><p>点击publish repository即可将项目上传到github</p><p><img src="https://yrain11.oss-cn-hangzhou.aliyuncs.com/pictures/202311261453070.png" alt="image-20231126145355010"></p><h2 id="仓库的下载"><a href="#仓库的下载" class="headerlink" title="仓库的下载"></a>仓库的下载</h2><p>点击clone rep</p><p><img src="https://yrain11.oss-cn-hangzhou.aliyuncs.com/pictures/202311261455854.png" alt="image-20231126145547794"></p><p><img src="https://yrain11.oss-cn-hangzhou.aliyuncs.com/pictures/202311261457153.png" alt="image-20231126145748075"></p><p>仓库克隆支持三个方式，一个是从你的账号中挑选，一个是企业版的，还有一个是通过url来下载，url一般用来下载其他人的仓库。然后选择好下载位置点击clone即可下载。</p><h1 id="项目管理"><a href="#项目管理" class="headerlink" title="项目管理"></a>项目管理</h1><h2 id="分支管理"><a href="#分支管理" class="headerlink" title="分支管理"></a>分支管理</h2><p><img src="https://yrain11.oss-cn-hangzhou.aliyuncs.com/pictures/202311261516689.jpg" alt="实际项目中如何使用Git做分支管理 - 知乎"></p><p><a href="https://zhuanlan.zhihu.com/p/38772378">实际项目中如何使用Git做分支管理 - 知乎 (zhihu.com)</a></p><p>实际项目中需要哪些分支</p><p>master分支：主分支，发布的分支。</p><p>develop:开发分支，和master并行，所有开发者在该分支进行开发。</p><p>release:修改版本号的分支，从develop分出，将修改后的结果合并到develop和master上</p><p>feature:个人分支，每个开发者开发功能时要从开发分支上创建自己的分支，功能开发完毕后合并到开发分支上。</p><p>hotfixes：修复紧急bug分支，当bug出现在master分支上时需要紧急修改时用的分支。</p><h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><h3 id="分支创建"><a href="#分支创建" class="headerlink" title="分支创建"></a>分支创建</h3><p><img src="https://yrain11.oss-cn-hangzhou.aliyuncs.com/pictures/202311261526849.png" alt="image-20231126152635775"></p><p>点击new branch即可创建分支</p><h3 id="提交修改"><a href="#提交修改" class="headerlink" title="提交修改"></a>提交修改</h3><p>选择提交的内容，并添加备注，点击commit即可。在history中可以看到提交历史</p><p><img src="https://yrain11.oss-cn-hangzhou.aliyuncs.com/pictures/202311261529452.png" alt="image-20231126152902371"></p><h3 id="合并分支"><a href="#合并分支" class="headerlink" title="合并分支"></a>合并分支</h3><ol><li>点击Preview Pull Request</li></ol><p><img src="https://yrain11.oss-cn-hangzhou.aliyuncs.com/pictures/202311261542518.png" alt="image-20231126154231451"></p><ol start="2"><li>选择需要合并到哪个分支</li></ol><p>一般合并到develop分支</p><p><img src="https://yrain11.oss-cn-hangzhou.aliyuncs.com/pictures/202311261543894.png" alt="image-20231126154348818"></p><ol start="3"><li><p>点击create pull request</p></li><li><p>这时会跳到网页端</p><p><img src="https://yrain11.oss-cn-hangzhou.aliyuncs.com/pictures/202311261545887.png" alt="image-20231126154541798"></p></li></ol><p>这个时候点击create pull requeset</p><p>再点击Merge pull request，confirm merge即可完成合并</p><p><img src="https://yrain11.oss-cn-hangzhou.aliyuncs.com/pictures/202311261546503.png" alt="image-20231126154644407"></p><p>当然，如果想在本地进行合并分支，可以在branch中合并，你需要进入主分支，并选择新分支，进行合并。</p><p><img src="https://yrain11.oss-cn-hangzhou.aliyuncs.com/pictures/202311261559310.png" alt="image-20231126155919237"></p><h3 id="删除分支"><a href="#删除分支" class="headerlink" title="删除分支"></a>删除分支</h3><p><img src="https://yrain11.oss-cn-hangzhou.aliyuncs.com/pictures/202311261548920.png" alt="image-20231126154830849"></p><h3 id="还原分支"><a href="#还原分支" class="headerlink" title="还原分支"></a>还原分支</h3><p>在history中选择需要还原的分支，右键选择revert changes </p><p><img src="https://yrain11.oss-cn-hangzhou.aliyuncs.com/pictures/202311261605790.png" alt="image-20231126160504707"></p><p>这时会提示冲突，你可以参考这篇文章：<a href="https://blog.csdn.net/weixin_44259720/article/details/112615134">GitHub Desktop 上实现项目的回滚操作，详细介绍_revert this commit_Java Punk的博客-CSDN博客</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 教程 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> unity </tag>
+            
+            <tag> git </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>git安装和配置</title>
       <link href="/posts/af9d867.html"/>
       <url>/posts/af9d867.html</url>
